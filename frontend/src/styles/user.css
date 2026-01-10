@@ -1,0 +1,56 @@
+.users-page {
+  max-width: 1000px;
+}
+
+.user-card {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+}
+
+.user-form {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.user-form input,
+.user-form select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.user-form button {
+  background: #2684ff;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.user-form button:hover {
+  background: #1b6fd8;
+}
+
+/* Table */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table th,
+.users-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.users-table select {
+  padding: 6px 8px;
+  border-radius: 6px;
+}

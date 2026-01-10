@@ -1,0 +1,230 @@
+.issues-page {
+  width: 100%;
+}
+
+.issues-header {
+  margin-bottom: 20px;
+}
+
+/* Table wrapper */
+.issues-table-wrapper {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  overflow-x: auto;
+}
+
+/* Table */
+.issues-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.issues-table thead {
+  background: #f4f5f7; /* Jira-like light grey */
+}
+
+.issues-table th,
+.issues-table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.issue-title {
+  font-weight: 500;
+}
+
+/* Badges */
+.badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Status colors */
+.status-open {
+  color: #e3f2fd;
+  background: #1565c0;
+}
+
+.status-inprogress {
+  color: #ffece1;
+  background: #f9a825;
+}
+
+.status-resolved {
+  color: #e8f5e9;
+  background: #2e7d32;
+}
+
+.status-closed {
+  color: #eceff1;
+  background: #455a64;
+}
+
+/* Priority colors */
+.priority-high {
+  color: #fdecea;
+  background: #c62828;
+}
+
+.priority-medium {
+  color: #fff3e0;
+  background: #ef6c00;
+}
+
+.priority-low {
+  color: #e8f5e9;
+  background: #2e7d32;
+}
+
+/* Action buttons */
+.btn-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+}
+
+.btn-link.danger {
+  color: #d32f2f;
+}
+
+.btn-link.danger:hover {
+  text-decoration: underline;
+}
+
+/* Filters */
+.issues-filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+}
+
+.filter-group label {
+  margin-bottom: 4px;
+  color: #555;
+}
+
+.filter-group select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  outline: none;
+}
+
+.filter-group select:focus {
+  border-color: #2684ff; /* Jira blue */
+}
+
+/* Empty state */
+.no-data {
+  text-align: center;
+  padding: 20px;
+  color: #777;
+}
+
+/* Issue details */
+.issue-details-page {
+  max-width: 900px;
+}
+
+.issue-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.issue-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.assignee {
+  font-size: 13px;
+  color: #555;
+}
+
+/* Sections */
+.issue-section {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+}
+
+/* Comments */
+.comment-input {
+  width: 100%;
+  min-height: 70px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 8px;
+  resize: vertical;
+}
+
+.comment-btn {
+  background: #2684ff;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.comment-btn:hover {
+  background: #1b6fd8;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.comment-item {
+  border-top: 1px solid #eee;
+  padding-top: 12px;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.comment-time {
+  color: #888;
+}
+
+.btn-link.small {
+  font-size: 12px;
+}
+
+.issue-link {
+  color: #172b4d; /* Jira text color */
+  text-decoration: none;
+}
+
+.issue-link:hover {
+  text-decoration: underline;
+}

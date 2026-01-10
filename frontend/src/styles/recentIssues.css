@@ -1,0 +1,124 @@
+.recent-issues {
+  margin-top: 32px;
+}
+
+.recent-issues h3 {
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+.issues-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.issue-card {
+  background: #0f1a2f;
+  padding: 18px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.issue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.issue-id {
+  font-size: 13px;
+  color: #8fa3c7;
+}
+
+.priority {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.priority-low {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.priority-medium {
+  background: rgba(234, 179, 8, 0.15);
+  color: #eab308;
+}
+
+.priority-high {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.issue-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.issue-desc {
+  font-size: 13px;
+  color: #8fa3c7;
+  line-height: 1.4;
+}
+
+.issue-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.status-open {
+  background: rgba(14, 165, 233, 0.15);
+  color: #0ea5e9;
+}
+
+.status-progress {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.status-resolved {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.status-closed {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+}
+
+.assignee {
+  width: 32px;
+  height: 32px;
+  background: #14b8a6;
+  color: #001;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.issue-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  border: 1px solid #1c2740;
+}
+
+.issue-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  border-color: rgba(20, 184, 166, 0.4);
+}

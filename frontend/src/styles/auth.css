@@ -1,0 +1,143 @@
+.auth-container {
+  display: flex;
+  height: 140vh;
+  background: #0b1220;
+  color: #ffffff;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+/* LEFT */
+.auth-left {
+  flex: 1;
+  padding: 60px;
+  background: linear-gradient(180deg, #0b1220, #0f1a2f);
+}
+
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 40px;
+}
+
+.bug {
+  background: #2dd4bf;
+  color: #0b1220;
+  padding: 8px;
+  border-radius: 12px;
+}
+
+.auth-left h1 {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.auth-subtitle {
+  color: #8fa3c7;
+  margin-bottom: 40px;
+}
+
+.auth-form {
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-form input {
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid #1f2b46;
+  background: #0f1a2f;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.auth-form input::placeholder {
+  color: #7f90b3;
+}
+
+.auth-form button {
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  background: #ffffff;
+  color: #000000;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-switch {
+  margin-top: 20px;
+  color: #8fa3c7;
+}
+
+.auth-switch a {
+  color: #2dd4bf;
+  text-decoration: none;
+}
+
+/* RIGHT */
+.auth-right {
+  flex: 1;
+  background: #0f1a2f;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px;
+}
+
+.auth-illustration {
+  width: 240px;
+  height: 240px;
+  background: linear-gradient(180deg, #0f3b4a, #0b1220);
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.bug-large {
+  font-size: 80px;
+  color: #2dd4bf;
+}
+
+.auth-right h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.auth-right p {
+  color: #8fa3c7;
+  max-width: 360px;
+}
+
+.auth-form select {
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid #1f2b46;
+  background: #0f1a2f;
+  color: #ffffff;
+  font-size: 14px;
+  appearance: none;
+  cursor: pointer;
+}
+
+.auth-form select option {
+  background: #0f1a2f;
+  color: #ffffff;
+}
+
+.auth-error {
+  background: rgba(255, 0, 0, 0.1);
+  color: #ff6b6b;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+}
