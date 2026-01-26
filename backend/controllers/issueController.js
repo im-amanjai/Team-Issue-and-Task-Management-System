@@ -1,41 +1,65 @@
+const mongoose = require("mongoose");
 const Issue = require("../models/Issue");
+const User = require("../models/User");
 const Notification = require("../models/Notification");
+
+const {
+  emitIssueCreated,
+  emitIssueAssigned,
+  emitIssueUpdated,
+  emitIssueDeleted,
+} = require("../socket/events");
 
 /**
  * CREATE ISSUE
- * Admin / Manager (Member optional later)
  */
 exports.createIssue = async (req, res) => {
   try {
-    if (!["admin", "manager"].includes(req.user.role)) {
-      return res.status(403).json({ message: "Not allowed to create issue" });
+    const { assignee, ...rest } = req.body;
+    const { role, userId } = req.user;
+
+    if (role === "member") {
+      return res.status(403).json({ message: "Members cannot create issues" });
     }
 
     const issue = await Issue.create({
-      ...req.body,
-      status: "todo",
-      reporter: req.user.id,
+      ...rest,
+      reporter: new mongoose.Types.ObjectId(userId),
+      assignee: assignee ? new mongoose.Types.ObjectId(assignee) : null,
+      status: assignee ? "in_progress" : "todo",
     });
 
+    if (assignee) {
+      await Notification.create({
+        user: assignee,
+        issue: issue._id,
+        message: "You have been assigned a new issue",
+      });
+    }
+
+    emitIssueCreated(issue);
+    if (assignee) emitIssueAssigned(issue, assignee);
+
     res.status(201).json(issue);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
 /**
- * GET ISSUES (role-based visibility)
- * - Admin: all issues
- * - Manager: all issues (project-scoped later)
- * - Member: only assigned issues
+ * GET MY ISSUES 
  */
 exports.getIssues = async (req, res) => {
   try {
+    const userObjectId = new mongoose.Types.ObjectId(req.user.userId);
     let query = {};
 
     if (req.user.role === "member") {
-      query.assignee = req.user.id;
+      // Member sees only assigned issues
+      query.assignee = userObjectId;
     }
+
+    // Managers/Admins see all issues
 
     const issues = await Issue.find(query)
       .populate("reporter", "name role")
@@ -43,117 +67,94 @@ exports.getIssues = async (req, res) => {
       .sort({ updatedAt: -1 });
 
     res.json(issues);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
 /**
- * ASSIGN ISSUE (Manager / Admin)
- * Sets status → in_progress
- * Sends notification
+ * ASSIGN ISSUE
  */
 exports.assignIssue = async (req, res) => {
   try {
-    if (!["admin", "manager"].includes(req.user.role)) {
-      return res.status(403).json({ message: "Not allowed to assign issues" });
-    }
+    const { assignedTo } = req.body;
+    const { role } = req.user;
 
-    const { userId } = req.body;
+    if (!["admin", "manager"].includes(role)) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
 
     const issue = await Issue.findById(req.params.id);
-    if (!issue) {
-      return res.status(404).json({ message: "Issue not found" });
-    }
+    if (!issue) return res.status(404).json({ message: "Issue not found" });
 
-    issue.assignee = userId;
+    const assignee = await User.findById(assignedTo);
+    if (!assignee) return res.status(400).json({ message: "Invalid assignee" });
+
+    if (role === "admin" && assignee.role !== "manager")
+      return res.status(403).json({ message: "Admin → Manager only" });
+
+    if (role === "manager" && assignee.role !== "member")
+      return res.status(403).json({ message: "Manager → Member only" });
+
+    issue.assignee = new mongoose.Types.ObjectId(assignedTo);
     issue.status = "in_progress";
     await issue.save();
 
     await Notification.create({
-      userId,
-      issueId: issue._id,
+      user: assignedTo,
+      issue: issue._id,
       message: "You have been assigned a new issue",
     });
 
-    res.json({
-      message: "Issue assigned successfully",
-      issue,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    emitIssueAssigned(issue, assignedTo);
+    emitIssueUpdated(issue);
+
+    res.json({ message: "Issue assigned", issue });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
 /**
- * UPDATE ISSUE STATUS (role-based workflow)
+ * UPDATE STATUS
  */
 exports.updateStatus = async (req, res) => {
   try {
     const { status } = req.body;
     const issue = await Issue.findById(req.params.id);
+    if (!issue) return res.status(404).json({ message: "Issue not found" });
 
-    if (!issue) {
-      return res.status(404).json({ message: "Issue not found" });
+    if (
+      req.user.role === "member" &&
+      String(issue.assignee) !== String(req.user.userId)
+    ) {
+      return res.status(403).json({ message: "Not your issue" });
     }
 
-    // MEMBER RULES
-    if (req.user.role === "member") {
-      if (String(issue.assignee) !== req.user.id) {
-        return res.status(403).json({ message: "Not your assigned issue" });
-      }
-
-      const allowed = {
-        todo: ["in_progress"],
-        in_progress: ["done"],
-      };
-
-      if (!allowed[issue.status]?.includes(status)) {
-        return res
-          .status(403)
-          .json({ message: "Invalid status transition" });
-      }
-    }
-
-    // MANAGER RULES
-    if (req.user.role === "manager") {
-      if (!["todo", "in_progress", "done", "closed"].includes(status)) {
-        return res
-          .status(403)
-          .json({ message: "Invalid status for manager" });
-      }
-    }
-
-    // ADMIN → full access
     issue.status = status;
     await issue.save();
 
-    res.json({
-      message: "Issue status updated successfully",
-      issue,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    emitIssueUpdated(issue);
+
+    res.json({ message: "Status updated", issue });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
 /**
- * DELETE ISSUE (Admin only)
+ * DELETE ISSUE
  */
 exports.deleteIssue = async (req, res) => {
   try {
-    if (req.user.role !== "admin") {
-      return res.status(403).json({ message: "Admins only" });
-    }
-
     const issue = await Issue.findById(req.params.id);
-    if (!issue) {
-      return res.status(404).json({ message: "Issue not found" });
-    }
+    if (!issue) return res.status(404).json({ message: "Issue not found" });
 
     await issue.deleteOne();
-    res.json({ message: "Issue deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    emitIssueDeleted(issue);
+
+    res.json({ message: "Issue deleted" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };

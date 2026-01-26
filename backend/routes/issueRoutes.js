@@ -12,7 +12,7 @@ const {
   deleteIssue,
 } = require("../controllers/issueController");
 
-// Create issue → Admin & Manager only
+// Create issue (Admin & Manager only)
 router.post(
   "/",
   verifyToken,
@@ -20,14 +20,14 @@ router.post(
   createIssue
 );
 
-// Get issues → All roles (visibility handled in controller)
+// Get issues - All roles (visibility handled in controller)
 router.get(
   "/",
   verifyToken,
   getIssues
 );
 
-// Assign issue → Admin & Manager
+// Assign issue - Admin & Manager
 router.put(
   "/:id/assign",
   verifyToken,
@@ -35,14 +35,14 @@ router.put(
   assignIssue
 );
 
-// Update status → All roles (rules enforced in controller)
+// Update status - All roles (rules enforced in controller)
 router.put(
   "/:id/status",
   verifyToken,
   updateStatus
 );
 
-// Delete issue → Admin only
+// Delete issue - Admin only
 router.delete(
   "/:id",
   verifyToken,

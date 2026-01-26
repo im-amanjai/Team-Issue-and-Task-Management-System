@@ -3,7 +3,7 @@ import axios from "axios";
 const API_URL = "http://localhost:5000/api/issues";
 
 export const getMyIssues = (token) =>
-  axios.get(`${API_URL}/my`, {
+  axios.get(`${API_URL}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

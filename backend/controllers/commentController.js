@@ -27,7 +27,7 @@ exports.addComment = async (req, res) => {
 
     /* NOTIFICATIONS */
 
-    // Notify assigned user (if exists & not self)
+    // Notify assigned user
     if (
       issue.assignedTo &&
       String(issue.assignedTo) !== req.user.userId
@@ -39,7 +39,7 @@ exports.addComment = async (req, res) => {
       });
     }
 
-    // notify issue creator (if not self)
+    // notify issue creator
     if (String(issue.createdBy) !== req.user.userId) {
       await Notification.create({
         userId: issue.createdBy,

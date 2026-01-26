@@ -4,25 +4,23 @@ const issueSchema = new mongoose.Schema(
   {
     issueKey: {
       type: String,
-      required: true,
       unique: true,
     },
 
     title: {
       type: String,
       required: true,
-      trim: true,
     },
 
     description: {
       type: String,
-      trim: true,
+      required: true,
     },
 
-    type: {
+    category: {
       type: String,
-      enum: ["bug", "task", "story"],
-      required: true,
+      enum: ["bug", "feature", "task"],
+      default: "task",
     },
 
     priority: {
@@ -35,12 +33,6 @@ const issueSchema = new mongoose.Schema(
       type: String,
       enum: ["todo", "in_progress", "done", "closed"],
       default: "todo",
-    },
-
-    project: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Project",
-      required: true,
     },
 
     reporter: {
@@ -57,5 +49,13 @@ const issueSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Auto-generate ISSUE KEY
+issueSchema.pre("save", async function () {
+  if (this.issueKey) return;
+
+  const count = await mongoose.model("Issue").countDocuments();
+  this.issueKey = `ISS-${String(count + 1).padStart(3, "0")}`;
+});
 
 module.exports = mongoose.model("Issue", issueSchema);

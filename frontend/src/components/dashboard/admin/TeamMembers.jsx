@@ -2,28 +2,28 @@ import "../../../styles/teamMembers.css";
 
 const members = [
   {
-    name: "Sarah Miller",
+    name: "John Doe",
     role: "Manager",
     issues: 12,
-    initials: "SM",
+    initials: "JD",
   },
   {
-    name: "David Wilson",
+    name: "Alice Bob",
     role: "Developer",
     issues: 8,
-    initials: "DW",
+    initials: "AB",
   },
   {
-    name: "Emma Clark",
+    name: "Kasak Anand",
     role: "Developer",
     issues: 6,
-    initials: "EC",
+    initials: "KA",
   },
   {
-    name: "Michael Moore",
+    name: "Aman Jaiswal",
     role: "Designer",
     issues: 4,
-    initials: "MM",
+    initials: "AJ",
   },
 ];
 

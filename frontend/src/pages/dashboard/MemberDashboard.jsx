@@ -1,37 +1,16 @@
-import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
 import StatsGrid from "../../components/dashboard/common/StatsGrid";
 import RecentIssues from "../../components/dashboard/common/RecentIssues";
 import AssignedIssues from "../../components/dashboard/member/AssignedIssues";
 
-import { getMyIssues } from "../../api/issueApi";
 import "../../styles/dashboard.css";
 
-const MemberDashboard = () => {
-  const [issues, setIssues] = useState([]);
+const MemberDashboard = ({ issues }) => {
   const { searchQuery } = useOutletContext();
-  const [loading, setLoading] = useState(true);
+  const safeIssues = Array.isArray(issues) ? issues : [];
 
-  const token = localStorage.getItem("token");
-
-  useEffect(() => {
-    getMyIssues(token)
-      .then((res) => {
-        setIssues(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Failed to load member issues", err);
-        setLoading(false);
-      });
-  }, [token]);
-
-  if (loading) {
-    return <div className="dashboard-container">Loading...</div>;
-  }
-
-  const filteredIssues = issues.filter((issue) => {
+  const filteredIssues = safeIssues.filter((issue) => {
     const q = searchQuery.toLowerCase();
     return (
       issue.title.toLowerCase().includes(q) ||
@@ -56,7 +35,6 @@ const MemberDashboard = () => {
       ) : (
         <>
           <AssignedIssues issues={filteredIssues} />
-
           <RecentIssues issues={recentIssues} />
         </>
       )}

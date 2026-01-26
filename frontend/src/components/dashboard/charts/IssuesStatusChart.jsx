@@ -7,14 +7,27 @@ import {
 } from "recharts";
 import "./IssueStatusChart.css";
 
-const data = [
-  { name: "Open", value: 3, color: "#0ea5e9" },
-  { name: "In Progress", value: 3, color: "#f59e0b" },
-  { name: "Resolved", value: 1, color: "#22c55e" },
-  { name: "Closed", value: 1, color: "#94a3b8" },
-];
+const IssuesStatusChart = ({ issues }) => {
+  const safeIssues = Array.isArray(issues) ? issues : [];
 
-const IssuesStatusChart = () => {
+  const counts = {
+    todo: 0,
+    in_progress: 0,
+    resolved: 0,
+  };
+
+  safeIssues.forEach((issue) => {
+    if (counts[issue.status] !== undefined) {
+      counts[issue.status]++;
+    }
+  });
+
+  const data = [
+    { name: "Todo", value: counts.todo, color: "#0ea5e9" },
+    { name: "In Progress", value: counts.in_progress, color: "#f59e0b" },
+    { name: "Resolved", value: counts.resolved, color: "#22c55e" },
+  ];
+
   return (
     <div className="chart-card">
       <h3>Issues by Status</h3>

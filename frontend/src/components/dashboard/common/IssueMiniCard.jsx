@@ -1,6 +1,5 @@
 import "../../../styles/recentIssues.css";
 
-// Backend enum → UI label
 const priorityLabel = {
   low: "Low",
   medium: "Medium",
@@ -10,11 +9,9 @@ const priorityLabel = {
 const statusLabel = {
   todo: "Todo",
   in_progress: "In Progress",
-  done: "Done",
-  closed: "Closed",
+  resolved: "Resolved",
 };
 
-// Backend enum → CSS class
 const priorityClass = {
   low: "priority-low",
   medium: "priority-medium",
@@ -24,8 +21,7 @@ const priorityClass = {
 const statusClass = {
   todo: "status-todo",
   in_progress: "status-progress",
-  done: "status-done",
-  closed: "status-closed",
+  resolved: "status-resolved",
 };
 
 const IssueMiniCard = ({ issue }) => {

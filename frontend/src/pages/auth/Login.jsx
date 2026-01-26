@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import AuthLayout from "../../components/auth/AuthLayout";
 import { loginUser } from "../../api/authApi";
-import useAuth from "../../hooks/useAuth";
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -28,13 +28,13 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = await loginUser(formData);
-    login(data);
-    redirectByRole(data.user.role);
+    setLoading(true);
+    setError("");
 
     try {
       const data = await loginUser(formData);
-      login(data);
+      login(data.user);
+      localStorage.setItem("token", data.token);
       redirectByRole(data.user.role);
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password");
@@ -57,12 +57,15 @@ const Login = () => {
           name="email"
           type="email"
           placeholder="Email"
+          value={formData.email}
           onChange={handleChange}
         />
+
         <input
           name="password"
           type="password"
           placeholder="Password"
+          value={formData.password}
           onChange={handleChange}
         />
 

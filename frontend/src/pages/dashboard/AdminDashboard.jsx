@@ -5,23 +5,19 @@ import TeamMembers from "../../components/dashboard/admin/TeamMembers";
 import RecentIssues from "../../components/dashboard/common/RecentIssues";
 import "../../styles/dashboard.css";
 
-const AdminDashboard = () => {
+const AdminDashboard = ({ issues }) => {
   return (
     <div className="dashboard-container">
-      {/* Top Stats */}
-      <StatsGrid />
+      <StatsGrid issues={issues} />
 
-      {/* Charts Section */}
       <div className="dashboard-charts">
-        <IssuesStatusChart />
-        <MonthlyIssuesChart />
+        <IssuesStatusChart issues={issues} />
+        <MonthlyIssuesChart issues={issues} />
       </div>
 
-      {/* Team Members (Admin only) */}
       <TeamMembers />
 
-      {/* Recently Updated */}
-      <RecentIssues />
+      <RecentIssues issues={issues} />
     </div>
   );
 };

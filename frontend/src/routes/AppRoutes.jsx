@@ -12,15 +12,20 @@ import ManagerDashboard from "../pages/dashboard/ManagerDashboard";
 import MemberDashboard from "../pages/dashboard/MemberDashboard";
 
 import IssueDetail from "../pages/member/IssueDetail";
+import ManagerIssues from "../pages/manager/ManagerIssues";
+import CreateIssue from "../pages/manager/CreateIssue";
+import ManagerIssueDetail from "../pages/manager/ManagerIssueDetail";
 
 import ProtectedRoute from "../components/common/ProtectedRoute";
 
-const AppRoutes = () => {
+const AppRoutes = ({ issues }) => {
   return (
     <Routes>
+      {/* Public */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
+      {/* Admin */}
       <Route
         path="/admin/*"
         element={
@@ -29,9 +34,10 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       >
-        <Route index element={<AdminDashboard />} />
+        <Route index element={<AdminDashboard issues={issues} />} />
       </Route>
 
+      {/* Manager */}
       <Route
         path="/manager/*"
         element={
@@ -40,9 +46,19 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       >
-        <Route index element={<ManagerDashboard />} />
+        <Route index element={<ManagerDashboard issues={issues} />} />
+        <Route
+          path="issues"
+          element={<ManagerIssues issues={issues} />}
+        />
+        <Route path="issues/new" element={<CreateIssue />} />
+        <Route
+          path="issues/:id"
+          element={<ManagerIssueDetail issues={issues} />}
+        />
       </Route>
 
+      {/* Member */}
       <Route
         path="/member/*"
         element={
@@ -51,9 +67,11 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       >
-        <Route index element={<MemberDashboard />} />
-
-        <Route path="issues/:id" element={<IssueDetail />} />
+        <Route index element={<MemberDashboard issues={issues} />} />
+        <Route
+          path="issues/:id"
+          element={<IssueDetail issues={issues} />}
+        />
       </Route>
 
       <Route path="*" element={<Navigate to="/login" />} />

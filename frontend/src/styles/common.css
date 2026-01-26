@@ -1,3 +1,7 @@
+/* /* =========================
+   CONFIRM MODAL (DELETE ETC.)
+   ========================= */
+
 .confirm-overlay {
   position: fixed;
   inset: 0;
@@ -5,7 +9,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 9000;
 }
 
 .confirm-box {
@@ -15,7 +19,6 @@
   width: 300px;
   border-radius: 10px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-  animation: confirmFade 0.2s ease;
 }
 
 .confirm-actions {
@@ -41,13 +44,119 @@
   color: white;
 }
 
-@keyframes confirmFade {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+/* =========================
+   CREATE ISSUE MODAL
+   ========================= */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 10, 20, 0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000; /* ABOVE confirm overlay */
+}
+
+.modal-card {
+  position: relative;
+  z-index: 10001;
+  width: 520px;
+  background: #0f1a2f !important;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+/* Body layout */
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Form groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+/* Two-column row */
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+/* Inputs */
+.modal-card input,
+.modal-card textarea,
+.modal-card select {
+  background: #13203a;
+  border: 1px solid #1c2740;
+  color: #ffffff;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+}
+
+.modal-card textarea {
+  resize: none;
+}
+
+/* Footer */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+/* Buttons */
+.btn-primary {
+  background: #14b8a6;
+  color: #022c22;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: #1e293b;
+  color: #e5e7eb;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
 }

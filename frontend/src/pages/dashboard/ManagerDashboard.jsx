@@ -4,19 +4,17 @@ import MonthlyIssuesChart from "../../components/dashboard/charts/MonthlyIssuesC
 import RecentIssues from "../../components/dashboard/common/RecentIssues";
 import "../../styles/dashboard.css";
 
-const ManagerDashboard = () => {
+const ManagerDashboard = ({ issues }) => {
   return (
     <div className="dashboard-container">
-      <StatsGrid />
+      <StatsGrid issues={issues} />
 
       <div className="dashboard-charts">
-        <IssuesStatusChart />
-        <MonthlyIssuesChart />
+        <IssuesStatusChart issues={issues} />
+        <MonthlyIssuesChart issues={issues} />
       </div>
 
-      {/* NO Team Members for Manager */}
-
-      <RecentIssues />
+      <RecentIssues issues={issues} />
     </div>
   );
 };

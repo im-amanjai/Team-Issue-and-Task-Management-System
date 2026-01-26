@@ -8,13 +8,25 @@ import {
 } from "recharts";
 import "./MonthlyIssuesChart.css";
 
-const data = [
-  { month: "Nov", issues: 12 },
-  { month: "Dec", issues: 18 },
-  { month: "Jan", issues: 8 },
-];
+const MonthlyIssuesChart = ({ issues }) => {
+  const safeIssues = Array.isArray(issues) ? issues : [];
 
-const MonthlyIssuesChart = () => {
+  const monthMap = {};
+
+  safeIssues.forEach((issue) => {
+    if (!issue.createdAt) return;
+
+    const date = new Date(issue.createdAt);
+    const month = date.toLocaleString("default", { month: "short" });
+
+    monthMap[month] = (monthMap[month] || 0) + 1;
+  });
+
+  const data = Object.keys(monthMap).map((month) => ({
+    month,
+    issues: monthMap[month],
+  }));
+
   return (
     <div className="chart-card">
       <h3>Monthly Issues</h3>
@@ -22,7 +34,7 @@ const MonthlyIssuesChart = () => {
       <ResponsiveContainer width="100%" height={260}>
         <BarChart data={data}>
           <XAxis dataKey="month" stroke="#8fa3c7" />
-          <YAxis stroke="#8fa3c7" />
+          <YAxis stroke="#8fa3c7" allowDecimals={false} />
           <Tooltip />
           <Bar
             dataKey="issues"

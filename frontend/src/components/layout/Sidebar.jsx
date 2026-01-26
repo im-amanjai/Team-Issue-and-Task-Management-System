@@ -14,8 +14,8 @@ const Sidebar = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();           // clear localStorage + context
-    navigate("/login"); // redirect to login
+    logout();           
+    navigate("/login");
   };
 
   // Decide dashboard route by role
