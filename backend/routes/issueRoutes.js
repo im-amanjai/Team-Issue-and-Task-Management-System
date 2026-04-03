@@ -7,47 +7,19 @@ const allowRoles = require("../middleware/roleMiddleware");
 const {
   createIssue,
   getIssues,
+  getIssueById,
+  updateIssue,
   assignIssue,
   updateStatus,
   deleteIssue,
 } = require("../controllers/issueController");
 
-// Create issue (Admin & Manager only)
-router.post(
-  "/",
-  verifyToken,
-  allowRoles("admin", "manager"),
-  createIssue
-);
-
-// Get issues - All roles (visibility handled in controller)
-router.get(
-  "/",
-  verifyToken,
-  getIssues
-);
-
-// Assign issue - Admin & Manager
-router.put(
-  "/:id/assign",
-  verifyToken,
-  allowRoles("admin", "manager"),
-  assignIssue
-);
-
-// Update status - All roles (rules enforced in controller)
-router.put(
-  "/:id/status",
-  verifyToken,
-  updateStatus
-);
-
-// Delete issue - Admin only
-router.delete(
-  "/:id",
-  verifyToken,
-  allowRoles("admin"),
-  deleteIssue
-);
+router.post("/", verifyToken, createIssue);
+router.get("/", verifyToken, getIssues);
+router.get("/:id", verifyToken, getIssueById);
+router.patch("/:id", verifyToken, updateIssue);
+router.patch("/:id/assign", verifyToken, allowRoles("admin", "manager"), assignIssue);
+router.patch("/:id/status", verifyToken, updateStatus);
+router.delete("/:id", verifyToken, allowRoles("admin"), deleteIssue);
 
 module.exports = router;

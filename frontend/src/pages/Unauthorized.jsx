@@ -1,8 +1,15 @@
+import { Link } from "react-router-dom";
+
 const Unauthorized = () => {
   return (
-    <div style={{ padding: "40px" }}>
-      <h2>Unauthorized</h2>
-      <p>You do not have permission to access this page.</p>
+    <div className="center-screen">
+      <div className="auth-card">
+        <p className="eyebrow">Access denied</p>
+        <h1 className="auth-title">You do not have permission to view this page.</h1>
+        <Link className="primary-btn" to="/login">
+          Back to login
+        </Link>
+      </div>
     </div>
   );
 };

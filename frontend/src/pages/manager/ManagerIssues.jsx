@@ -1,123 +1,127 @@
-import { useEffect, useState, useCallback } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { deleteIssue, getIssues } from "../../api/issueApi";
+import { useAuth } from "../../context/AuthContext";
+
+const initialFilters = {
+  search: "",
+  status: "",
+  priority: "",
+  category: "",
+};
 
 const ManagerIssues = () => {
-  const token = localStorage.getItem("token");
-
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [issues, setIssues] = useState([]);
-  const [members, setMembers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState(initialFilters);
 
-  const [assigning, setAssigning] = useState(null);
-  const [selectedUser, setSelectedUser] = useState("");
-
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-
-      const [issuesRes, usersRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/issues", {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        axios.get("http://localhost:5000/api/users?role=member", {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      ]);
-
-      setIssues(issuesRes.data);
-      setMembers(usersRes.data);
-    } catch (error) {
-      console.error("Failed to load manager data", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [token]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const formatStatus = (status) =>
-    status.replace("_", " ").toUpperCase();
-
-  const assignIssue = async (issueId) => {
-    if (!selectedUser) return;
-
-    try {
-      await axios.put(
-        `http://localhost:5000/api/issues/${issueId}/assign`,
-        { userId: selectedUser },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      await fetchData();
-      setAssigning(null);
-      setSelectedUser("");
-    } catch {
-      alert("Failed to assign issue");
-    }
+  const loadIssues = () => {
+    getIssues(filters).then(setIssues).catch(() => setIssues([]));
   };
 
-  if (loading) return <p>Loading issues...</p>;
+  useEffect(() => {
+    loadIssues();
+  }, [filters.search, filters.status, filters.priority, filters.category]);
 
   return (
-    <div className="card">
-      <table className="issues-table">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Status</th>
-            <th>Priority</th>
-            <th>Assignee</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+    <div className="stack-lg">
+      <section className="panel">
+        <div className="panel-header">
+          <h2>Issue filters</h2>
+        </div>
+        <div className="form-grid">
+          <input
+            className="field"
+            placeholder="Search title, description, or key"
+            value={filters.search}
+            onChange={(event) =>
+              setFilters((state) => ({ ...state, search: event.target.value }))
+            }
+          />
+          <select
+            className="field"
+            value={filters.status}
+            onChange={(event) =>
+              setFilters((state) => ({ ...state, status: event.target.value }))
+            }
+          >
+            <option value="">All status</option>
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+          <select
+            className="field"
+            value={filters.priority}
+            onChange={(event) =>
+              setFilters((state) => ({ ...state, priority: event.target.value }))
+            }
+          >
+            <option value="">All priority</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+          <select
+            className="field"
+            value={filters.category}
+            onChange={(event) =>
+              setFilters((state) => ({ ...state, category: event.target.value }))
+            }
+          >
+            <option value="">All category</option>
+            <option value="bug">Bug</option>
+            <option value="feature">Feature</option>
+            <option value="task">Task</option>
+          </select>
+        </div>
+      </section>
 
-        <tbody>
-          {issues.map((issue) => (
-            <tr key={issue._id}>
-              <td>{issue.title}</td>
-              <td>{formatStatus(issue.status)}</td>
-              <td>{issue.priority}</td>
-              <td>{issue.assignee?.name || "Unassigned"}</td>
+      <section className="panel">
+        <div className="panel-header">
+          <h2>Issue list</h2>
+        </div>
 
-              <td>
-                {issue.assignee ? (
-                  "—"
-                ) : assigning === issue._id ? (
-                  <>
-                    <select
-                      value={selectedUser}
-                      onChange={(e) => setSelectedUser(e.target.value)}
-                    >
-                      <option value="">Select member</option>
-                      {members.map((m) => (
-                        <option key={m._id} value={m._id}>
-                          {m.name}
-                        </option>
-                      ))}
-                    </select>
-
-                    <button
-                      className="btn-primary"
-                      onClick={() => assignIssue(issue._id)}
-                    >
-                      Assign
-                    </button>
-                  </>
-                ) : (
+        <div className="list-table">
+          {issues.length === 0 ? (
+            <p className="muted-text">No issues match these filters.</p>
+          ) : (
+            issues.map((issue) => (
+              <div className="issue-row issue-row-card" key={issue._id}>
+                <div>
+                  <strong>
+                    {issue.issueKey} - {issue.title}
+                  </strong>
+                  <p>{issue.description}</p>
+                </div>
+                <div className="issue-meta issue-actions">
+                  <span>{issue.category}</span>
+                  <span>{issue.priority}</span>
+                  <span>{issue.status.replace("_", " ")}</span>
                   <button
-                    className="btn-secondary"
-                    onClick={() => setAssigning(issue._id)}
+                    className="secondary-btn compact-btn"
+                    onClick={() => navigate(issue._id)}
                   >
-                    Assign
+                    View
                   </button>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  {user.role === "admin" && (
+                    <button
+                      className="danger-btn compact-btn"
+                      onClick={async () => {
+                        await deleteIssue(issue._id);
+                        loadIssues();
+                      }}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
     </div>
   );
 };

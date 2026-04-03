@@ -7,7 +7,7 @@ const statusLabelMap = {
   todo: "Todo",
   in_progress: "In Progress",
   done: "Done",
-  closed: "Closed",
+  completed: "Completed",
 };
 
 const MyIssues = () => {
@@ -62,7 +62,7 @@ const MyIssues = () => {
             <option value="todo">Todo</option>
             <option value="in_progress">In Progress</option>
             <option value="done">Done</option>
-            <option value="closed">Closed</option>
+            <option value="completed">Completed</option>
           </select>
         </div>
 

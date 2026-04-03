@@ -2,68 +2,56 @@ const Comment = require("../models/Comment");
 const Notification = require("../models/Notification");
 const Issue = require("../models/Issue");
 
-/**
- * create comment (All authenticated users)
- * - Supports threaded comments
- * - Triggers notifications
- */
 exports.addComment = async (req, res) => {
   try {
     const { issueId, text, parentCommentId } = req.body;
 
-    // Check issue exists
+    if (!text?.trim()) {
+      return res.status(400).json({ message: "Comment text is required" });
+    }
+
     const issue = await Issue.findById(issueId);
     if (!issue) {
       return res.status(404).json({ message: "Issue not found" });
     }
 
-    // Create comment
     const comment = await Comment.create({
       issueId,
-      text,
+      text: text.trim(),
       parentCommentId: parentCommentId || null,
-      userId: req.user.userId
+      userId: req.user.userId,
     });
 
-    /* NOTIFICATIONS */
-
-    // Notify assigned user
-    if (
-      issue.assignedTo &&
-      String(issue.assignedTo) !== req.user.userId
-    ) {
+    if (issue.assignee && String(issue.assignee) !== String(req.user.userId)) {
       await Notification.create({
-        userId: issue.assignedTo,
-        issueId,
-        message: "New comment added on an issue assigned to you"
+        user: issue.assignee,
+        issue: issue._id,
+        message: `New comment on ${issue.title}`,
       });
     }
 
-    // notify issue creator
-    if (String(issue.createdBy) !== req.user.userId) {
+    if (String(issue.reporter) !== String(req.user.userId)) {
       await Notification.create({
-        userId: issue.createdBy,
-        issueId,
-        message: "New comment added on your issue"
+        user: issue.reporter,
+        issue: issue._id,
+        message: `New comment on ${issue.title}`,
       });
     }
 
-    res.status(201).json(comment);
+    const populatedComment = await Comment.findById(comment._id).populate(
+      "userId",
+      "name role"
+    );
+
+    res.status(201).json(populatedComment);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-/**
- * get comments for an issue(Threaded)
- * - Sorted by creation time
- * - includes author name androle
- */
 exports.getCommentsByIssue = async (req, res) => {
   try {
-    const comments = await Comment.find({
-      issueId: req.params.issueId
-    })
+    const comments = await Comment.find({ issueId: req.params.issueId })
       .populate("userId", "name role")
       .sort({ createdAt: 1 });
 
@@ -73,9 +61,6 @@ exports.getCommentsByIssue = async (req, res) => {
   }
 };
 
-/**
- * delete comment (Admin only)
- */
 exports.deleteComment = async (req, res) => {
   try {
     const comment = await Comment.findById(req.params.id);

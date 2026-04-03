@@ -1,17 +1,11 @@
-import axios from "axios";
+import axiosInstance from "./axiosInstance";
 
-const API_URL = "http://localhost:5000/api/notifications";
+export const getMyNotifications = async () => {
+  const response = await axiosInstance.get("/api/notifications/my");
+  return response.data;
+};
 
-export const getMyNotifications = (token) =>
-  axios.get(`${API_URL}/my`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-export const markNotificationRead = (id, token) =>
-  axios.patch(
-    `${API_URL}/${id}/read`,
-    {},
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
+export const markNotificationRead = async (id) => {
+  const response = await axiosInstance.patch(`/api/notifications/${id}/read`);
+  return response.data;
+};

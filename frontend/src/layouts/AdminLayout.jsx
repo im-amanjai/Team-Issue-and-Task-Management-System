@@ -1,19 +1,5 @@
-import Sidebar from "../components/layout/Sidebar";
-import Topbar from "../components/layout/Topbar";
-import { Outlet } from "react-router-dom";
+import AppShell from "../components/layout/AppShell";
 
-const AdminLayout = () => {
-  return (
-    <div className="app-layout">
-      <Sidebar />
-      <div className="main-content">
-        <Topbar />
-        <main className="admin-content">
-          <Outlet />
-        </main>
-      </div>
-    </div>
-  );
-};
+const AdminLayout = () => <AppShell />;
 
 export default AdminLayout;

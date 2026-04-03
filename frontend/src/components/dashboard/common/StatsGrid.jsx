@@ -16,8 +16,8 @@ const StatsGrid = ({ issues }) => {
   const inProgress = safeIssues.filter(
     (i) => i.status === "in_progress"
   ).length;
-  const resolved = safeIssues.filter(
-    (i) => i.status === "resolved"
+  const completed = safeIssues.filter(
+    (i) => i.status === "completed"
   ).length;
 
   const stats = [
@@ -38,8 +38,8 @@ const StatsGrid = ({ issues }) => {
       icon: <Clock />,
     },
     {
-      title: "Resolved",
-      value: resolved,
+      title: "Completed",
+      value: completed,
       icon: <CheckCircle />,
     },
   ];

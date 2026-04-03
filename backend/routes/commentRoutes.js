@@ -7,29 +7,11 @@ const allowRoles = require("../middleware/roleMiddleware");
 const {
   addComment,
   getCommentsByIssue,
-  deleteComment
+  deleteComment,
 } = require("../controllers/commentController");
 
-// Add comment
-router.post(
-  "/",
-  verifyToken,
-  addComment
-);
-
-// get comments for issue
-router.get(
-  "/:issueId",
-  verifyToken,
-  getCommentsByIssue
-);
-
-// Delete comment (Admin only)
-router.delete(
-  "/:id",
-  verifyToken,
-  allowRoles("admin"),
-  deleteComment
-);
+router.post("/", verifyToken, addComment);
+router.get("/issue/:issueId", verifyToken, getCommentsByIssue);
+router.delete("/:id", verifyToken, allowRoles("admin"), deleteComment);
 
 module.exports = router;

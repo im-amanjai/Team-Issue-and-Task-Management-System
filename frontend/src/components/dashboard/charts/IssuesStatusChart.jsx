@@ -13,7 +13,7 @@ const IssuesStatusChart = ({ issues }) => {
   const counts = {
     todo: 0,
     in_progress: 0,
-    resolved: 0,
+    completed: 0,
   };
 
   safeIssues.forEach((issue) => {
@@ -25,7 +25,7 @@ const IssuesStatusChart = ({ issues }) => {
   const data = [
     { name: "Todo", value: counts.todo, color: "#0ea5e9" },
     { name: "In Progress", value: counts.in_progress, color: "#f59e0b" },
-    { name: "Resolved", value: counts.resolved, color: "#22c55e" },
+    { name: "Completed", value: counts.completed, color: "#22c55e" },
   ];
 
   return (

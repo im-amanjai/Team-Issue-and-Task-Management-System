@@ -1,24 +1,24 @@
-import StatsGrid from "../../components/dashboard/common/StatsGrid";
-import IssuesStatusChart from "../../components/dashboard/charts/IssuesStatusChart";
-import MonthlyIssuesChart from "../../components/dashboard/charts/MonthlyIssuesChart";
-import TeamMembers from "../../components/dashboard/admin/TeamMembers";
-import RecentIssues from "../../components/dashboard/common/RecentIssues";
-import "../../styles/dashboard.css";
+import { useEffect, useState } from "react";
+import DashboardOverview from "../../components/dashboard/DashboardOverview";
+import { getIssues } from "../../api/issueApi";
+import { getDashboardData } from "../../api/dashboardApi";
 
-const AdminDashboard = ({ issues }) => {
+const AdminDashboard = () => {
+  const [issues, setIssues] = useState([]);
+  const [summary, setSummary] = useState(null);
+
+  useEffect(() => {
+    getIssues().then(setIssues).catch(() => setIssues([]));
+    getDashboardData("admin").then(setSummary).catch(() => setSummary(null));
+  }, []);
+
   return (
-    <div className="dashboard-container">
-      <StatsGrid issues={issues} />
-
-      <div className="dashboard-charts">
-        <IssuesStatusChart issues={issues} />
-        <MonthlyIssuesChart issues={issues} />
-      </div>
-
-      <TeamMembers />
-
-      <RecentIssues issues={issues} />
-    </div>
+    <DashboardOverview
+      title="Admin overview"
+      subtitle="Monitor the whole team, review trends, and manage system access."
+      issues={issues}
+      extraCards={[{ label: "Total users", value: summary?.totalUsers ?? 0 }]}
+    />
   );
 };
 

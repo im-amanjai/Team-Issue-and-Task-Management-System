@@ -18,7 +18,7 @@ exports.signup = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const allowedRoles = ["admin", "manager", "member"];
+    const allowedRoles = ["manager", "member"];
     const safeRole = allowedRoles.includes(role) ? role : "member";
 
     await User.create({
@@ -39,7 +39,7 @@ exports.signup = async (req, res) => {
 // LOGIN
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, adminCode } = req.body;
 
     const user = await User.findOne({ email });
     if (!user) {
@@ -49,6 +49,20 @@ exports.login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    if (user.role === "admin") {
+      if (!process.env.ADMIN_LOGIN_CODE) {
+        return res.status(500).json({
+          message: "Admin login code is not configured on the server",
+        });
+      }
+
+      if (adminCode !== process.env.ADMIN_LOGIN_CODE) {
+        return res.status(403).json({
+          message: "Admin access denied. Invalid admin code.",
+        });
+      }
     }
 
     const token = jwt.sign(

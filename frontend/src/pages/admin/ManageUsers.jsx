@@ -1,118 +1,132 @@
-import { useState } from "react";
-import "../../styles/user.css";
+import { useEffect, useState } from "react";
+import { createUser, deleteUser, getUsers, updateUserRole } from "../../api/userApi";
+import { useAuth } from "../../context/AuthContext";
 
 const ManageUsers = () => {
-  const [users, setUsers] = useState([
-    { id: 1, name: "Amit", email: "amit@test.com", role: "admin" },
-    { id: 2, name: "Riya", email: "riya@test.com", role: "manager" },
-    { id: 3, name: "Dev", email: "dev@test.com", role: "member" },
-  ]);
-
-  const [newUser, setNewUser] = useState({
+  const { user: currentUser } = useAuth();
+  const [users, setUsers] = useState([]);
+  const [form, setForm] = useState({
     name: "",
     email: "",
+    password: "",
     role: "member",
   });
+  const [error, setError] = useState("");
 
-  const handleCreateUser = (e) => {
-    e.preventDefault();
-
-    if (!newUser.name || !newUser.email) return;
-
-    setUsers([
-      ...users,
-      { id: Date.now(), ...newUser },
-    ]);
-
-    setNewUser({ name: "", email: "", role: "member" });
+  const loadUsers = () => {
+    getUsers().then(setUsers).catch(() => setUsers([]));
   };
 
-  const handleRoleChange = (id, role) => {
-    setUsers(
-      users.map((user) =>
-        user.id === id ? { ...user, role } : user
-      )
-    );
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  const handleCreate = async (event) => {
+    event.preventDefault();
+    setError("");
+
+    try {
+      await createUser(form);
+      setForm({ name: "", email: "", password: "", role: "member" });
+      loadUsers();
+    } catch (err) {
+      setError(err.response?.data?.message || "Unable to create user");
+    }
   };
 
   return (
-    <div className="users-page">
-      <h2>Manage Users</h2>
-      <p className="text-muted">
-        Create users and assign roles
-      </p>
+    <div className="stack-lg">
+      <section className="two-column">
+        <article className="panel">
+          <div className="panel-header">
+            <h2>Create user</h2>
+          </div>
+          <form className="stack-md" onSubmit={handleCreate}>
+            <input
+              className="field"
+              placeholder="Full name"
+              value={form.name}
+              onChange={(event) =>
+                setForm((state) => ({ ...state, name: event.target.value }))
+              }
+            />
+            <input
+              className="field"
+              type="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={(event) =>
+                setForm((state) => ({ ...state, email: event.target.value }))
+              }
+            />
+            <input
+              className="field"
+              type="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={(event) =>
+                setForm((state) => ({ ...state, password: event.target.value }))
+              }
+            />
+            <select
+              className="field"
+              value={form.role}
+              onChange={(event) =>
+                setForm((state) => ({ ...state, role: event.target.value }))
+              }
+            >
+              <option value="member">Member</option>
+              <option value="manager">Manager</option>
+              <option value="admin">Admin</option>
+            </select>
+            {error && <p className="error-text">{error}</p>}
+            <button className="primary-btn" type="submit">
+              Add user
+            </button>
+          </form>
+        </article>
 
-      <div className="user-card">
-        <h5>Create User</h5>
-
-        <form onSubmit={handleCreateUser} className="user-form">
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={newUser.name}
-            onChange={(e) =>
-              setNewUser({ ...newUser, name: e.target.value })
-            }
-          />
-
-          <input
-            type="email"
-            placeholder="Email"
-            value={newUser.email}
-            onChange={(e) =>
-              setNewUser({ ...newUser, email: e.target.value })
-            }
-          />
-
-          <select
-            value={newUser.role}
-            onChange={(e) =>
-              setNewUser({ ...newUser, role: e.target.value })
-            }
-          >
-            <option>Admin</option>
-            <option>Manager</option>
-            <option>Member</option>
-          </select>
-
-          <button type="submit">Create User</button>
-        </form>
-      </div>
-
-      <div className="user-card">
-        <h5>Users</h5>
-
-        <table className="users-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-            </tr>
-          </thead>
-
-          <tbody>
+        <article className="panel">
+          <div className="panel-header">
+            <h2>Existing users</h2>
+          </div>
+          <div className="list-table">
             {users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>
+              <div className="issue-row" key={user._id}>
+                <div>
+                  <strong>{user.name}</strong>
+                  <p>{user.email}</p>
+                </div>
+                <div className="row-actions">
                   <select
+                    className="inline-select"
                     value={user.role}
-                    onChange={(e) =>
-                      handleRoleChange(user.id, e.target.value)
-                    }
+                    disabled={currentUser?._id === user._id}
+                    onChange={async (event) => {
+                      await updateUserRole(user._id, event.target.value);
+                      loadUsers();
+                    }}
                   >
-                    <option>Admin</option>
-                    <option>Manager</option>
-                    <option>Member</option>
+                    <option value="member">Member</option>
+                    <option value="manager">Manager</option>
+                    <option value="admin">Admin</option>
                   </select>
-                </td>
-              </tr>
+                  <button
+                    className="danger-btn compact-btn"
+                    disabled={currentUser?._id === user._id}
+                    onClick={async () => {
+                      await deleteUser(user._id);
+                      loadUsers();
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </div>
+        </article>
+      </section>
     </div>
   );
 };

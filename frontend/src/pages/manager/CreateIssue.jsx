@@ -1,132 +1,117 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { createIssue } from "../../api/issueApi";
+import { getAssignableUsers } from "../../api/userApi";
+import { useAuth } from "../../context/AuthContext";
 
 const CreateIssue = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-
+  const { user } = useAuth();
+  const [assignableUsers, setAssignableUsers] = useState([]);
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
     title: "",
     description: "",
-    category: "bug",
+    category: "task",
     priority: "medium",
+    assignee: "",
   });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  useEffect(() => {
+    if (user.role === "member") return;
+    getAssignableUsers().then(setAssignableUsers).catch(() => setAssignableUsers([]));
+  }, [user.role]);
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError("");
-    setLoading(true);
 
     try {
-      await axios.post(
-        "http://localhost:5000/api/issues",
-        form,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      navigate("/manager/issues");
+      const issue = await createIssue({
+        ...form,
+        assignee: form.assignee || undefined,
+      });
+      navigate(`/${user.role}/issues/${issue._id}`);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to create issue");
-    } finally {
-      setLoading(false);
+      setError(err.response?.data?.message || "Unable to create issue");
     }
   };
 
   return (
-    <div className="dashboard-container">
-      <div className="card" style={{ maxWidth: "800px" }}>
-        <h2>Create Issue</h2>
-
-        {error && <p style={{ color: "red" }}>{error}</p>}
-
-        {/* Title */}
-        <div className="form-group">
-          <label>Title</label>
-          <input
-            name="title"
-            type="text"
-            placeholder="Issue title"
-            value={form.title}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Description */}
-        <div className="form-group">
-          <label>Description</label>
-          <textarea
-            name="description"
-            placeholder="Describe the issue"
-            rows={4}
-            value={form.description}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Category + Priority */}
-        <div className="form-row">
-          <div className="form-group">
-            <label>Category</label>
-            <select
-              name="category"
-              value={form.category}
-              onChange={handleChange}
-            >
-              <option value="bug">Bug</option>
-              <option value="feature">Feature</option>
-              <option value="task">Task</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label>Priority</label>
-            <select
-              name="priority"
-              value={form.priority}
-              onChange={handleChange}
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="form-actions">
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={() => navigate("/manager/issues")}
-          >
-            Cancel
-          </button>
-
-          <button
-            className="btn-primary"
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? "Creating..." : "Create Issue"}
-          </button>
-        </div>
+    <section className="panel panel-form">
+      <div className="panel-header">
+        <h2>Create issue</h2>
       </div>
-    </div>
+
+      {user.role !== "manager" && (
+        <p className="error-text">Only managers can create and assign issues.</p>
+      )}
+
+      <form className="stack-md" onSubmit={handleSubmit}>
+        <input
+          className="field"
+          placeholder="Issue title"
+          value={form.title}
+          onChange={(event) =>
+            setForm((state) => ({ ...state, title: event.target.value }))
+          }
+        />
+        <textarea
+          className="field textarea"
+          placeholder="Describe the issue"
+          value={form.description}
+          onChange={(event) =>
+            setForm((state) => ({ ...state, description: event.target.value }))
+          }
+        />
+        <div className="form-grid">
+          <select
+            className="field"
+            value={form.category}
+            onChange={(event) =>
+              setForm((state) => ({ ...state, category: event.target.value }))
+            }
+          >
+            <option value="bug">Bug</option>
+            <option value="feature">Feature</option>
+            <option value="task">Task</option>
+          </select>
+          <select
+            className="field"
+            value={form.priority}
+            onChange={(event) =>
+              setForm((state) => ({ ...state, priority: event.target.value }))
+            }
+          >
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+
+        {user.role !== "member" && (
+          <select
+            className="field"
+            value={form.assignee}
+            onChange={(event) =>
+              setForm((state) => ({ ...state, assignee: event.target.value }))
+            }
+          >
+            <option value="">Unassigned</option>
+            {assignableUsers.map((option) => (
+              <option key={option._id} value={option._id}>
+                {option.name} ({option.email})
+              </option>
+            ))}
+          </select>
+        )}
+
+        {error && <p className="error-text">{error}</p>}
+        <button className="primary-btn" type="submit" disabled={user.role !== "manager"}>
+          Create issue
+        </button>
+      </form>
+    </section>
   );
 };
 

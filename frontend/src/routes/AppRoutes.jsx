@@ -1,80 +1,56 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-
-import Login from "../pages/auth/Login";
-import Register from "../pages/auth/Register";
-
+import { Navigate, Route, Routes } from "react-router-dom";
+import ProtectedRoute from "../components/common/ProtectedRoute";
 import AdminLayout from "../layouts/AdminLayout";
 import ManagerLayout from "../layouts/ManagerLayout";
 import MemberLayout from "../layouts/MemberLayout";
-
+import Login from "../pages/auth/Login";
+import Register from "../pages/auth/Register";
+import Unauthorized from "../pages/Unauthorized";
+import NotFound from "../pages/NotFound";
 import AdminDashboard from "../pages/dashboard/AdminDashboard";
 import ManagerDashboard from "../pages/dashboard/ManagerDashboard";
 import MemberDashboard from "../pages/dashboard/MemberDashboard";
-
-import IssueDetail from "../pages/member/IssueDetail";
+import ManageUsers from "../pages/admin/ManageUsers";
 import ManagerIssues from "../pages/manager/ManagerIssues";
 import CreateIssue from "../pages/manager/CreateIssue";
 import ManagerIssueDetail from "../pages/manager/ManagerIssueDetail";
+import IssueDetail from "../pages/member/IssueDetail";
 
-import ProtectedRoute from "../components/common/ProtectedRoute";
-
-const AppRoutes = ({ issues }) => {
+const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
 
-      {/* Admin */}
-      <Route
-        path="/admin/*"
-        element={
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <AdminLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<AdminDashboard issues={issues} />} />
+      <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="issues" element={<ManagerIssues />} />
+          <Route path="issues/:id" element={<ManagerIssueDetail />} />
+          <Route path="users" element={<ManageUsers />} />
+        </Route>
       </Route>
 
-      {/* Manager */}
-      <Route
-        path="/manager/*"
-        element={
-          <ProtectedRoute allowedRoles={["manager"]}>
-            <ManagerLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<ManagerDashboard issues={issues} />} />
-        <Route
-          path="issues"
-          element={<ManagerIssues issues={issues} />}
-        />
-        <Route path="issues/new" element={<CreateIssue />} />
-        <Route
-          path="issues/:id"
-          element={<ManagerIssueDetail issues={issues} />}
-        />
+      <Route element={<ProtectedRoute allowedRoles={["manager"]} />}>
+        <Route path="/manager" element={<ManagerLayout />}>
+          <Route index element={<ManagerDashboard />} />
+          <Route path="issues" element={<ManagerIssues />} />
+          <Route path="issues/new" element={<CreateIssue />} />
+          <Route path="issues/:id" element={<ManagerIssueDetail />} />
+        </Route>
       </Route>
 
-      {/* Member */}
-      <Route
-        path="/member/*"
-        element={
-          <ProtectedRoute allowedRoles={["member"]}>
-            <MemberLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<MemberDashboard issues={issues} />} />
-        <Route
-          path="issues/:id"
-          element={<IssueDetail issues={issues} />}
-        />
+      <Route element={<ProtectedRoute allowedRoles={["member"]} />}>
+        <Route path="/member" element={<MemberLayout />}>
+          <Route index element={<MemberDashboard />} />
+          <Route path="issues" element={<ManagerIssues />} />
+          <Route path="issues/:id" element={<IssueDetail />} />
+        </Route>
       </Route>
 
-      <Route path="*" element={<Navigate to="/login" />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };

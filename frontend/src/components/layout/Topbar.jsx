@@ -1,123 +1,95 @@
-import { Search, Bell } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
+import { Bell, Moon, Sun } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { getMyNotifications, markNotificationRead } from "../../api/notificationApi";
+import { useTheme } from "../../context/ThemeContext";
 
-import {
-  getMyNotifications,
-  markNotificationRead,
-} from "../../api/notificationApi";
+const titleMap = {
+  issues: "Issue Workspace",
+  users: "User Management",
+  new: "Create Issue",
+};
 
-import CreateIssueModal from "../issues/CreateIssueModal";
-
-const Topbar = ({ onSearch }) => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+const Topbar = () => {
   const location = useLocation();
-
-  const [open, setOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const [notifications, setNotifications] = useState([]);
-  const [showCreate, setShowCreate] = useState(false);
-
-  const token = localStorage.getItem("token");
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (token) {
-      getMyNotifications(token).then((res) => setNotifications(res.data));
+    getMyNotifications()
+      .then(setNotifications)
+      .catch(() => setNotifications([]));
+  }, [location.pathname]);
+
+  const unreadCount = useMemo(
+    () => notifications.filter((item) => !item.isRead).length,
+    [notifications]
+  );
+
+  const currentTitle = useMemo(() => {
+    const lastSegment = location.pathname.split("/").filter(Boolean).at(-1);
+    return titleMap[lastSegment] || "Dashboard";
+  }, [location.pathname]);
+
+  const handleRead = async (id) => {
+    try {
+      await markNotificationRead(id);
+      setNotifications((items) =>
+        items.map((item) =>
+          item._id === id ? { ...item, isRead: true } : item
+        )
+      );
+    } catch {
+      return;
     }
-  }, [token]);
-
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
-
-  const handleNotificationClick = async (notification) => {
-    await markNotificationRead(notification._id, token);
-
-    navigate(`/${user.role}/issues/${notification.issue._id}`);
-
-    setNotifications((prev) =>
-      prev.map((n) =>
-        n._id === notification._id ? { ...n, isRead: true } : n
-      )
-    );
-
-    setOpen(false);
-  };
-
-  // Page title based on route
-  const getPageTitle = () => {
-    if (location.pathname.includes("/issues")) return "Issues";
-    if (location.pathname.includes("/board")) return "Board";
-    return "Dashboard";
   };
 
   return (
-    <>
-      <header className="topbar">
-        <h1 className="topbar-title">{getPageTitle()}</h1>
+    <header className="topbar">
+      <div>
+        <p className="eyebrow">Team Issue & Task Management System</p>
+        <h1 className="page-title">{currentTitle}</h1>
+      </div>
 
-        <div className="topbar-actions">
-          <div className="search-box">
-            <Search size={18} />
-            <input
-              placeholder="Search issues..."
-              onChange={(e) => onSearch?.(e.target.value)}
-            />
-          </div>
+      <div className="topbar-actions">
+        <button className="icon-button" onClick={toggleTheme} aria-label="Toggle dark mode">
+          {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
+        </button>
 
-          {/* + New Issue (Admin & Manager only) */}
-          {user?.role !== "member" && (
-            <button
-              className="new-issue-btn"
-              onClick={() => setShowCreate(true)}
-            >
-              + New Issue
-            </button>
-          )}
+        <button className="icon-button" onClick={() => setOpen((value) => !value)}>
+          <Bell size={18} />
+          {unreadCount > 0 && <span className="badge-dot">{unreadCount}</span>}
+        </button>
 
-          {/* Notifications */}
-          <div className="notification-wrapper">
-            <button
-              className="icon-btn"
-              onClick={() => setOpen((prev) => !prev)}
-            >
-              <Bell size={18} />
-              {unreadCount > 0 && (
-                <span className="notification-badge">{unreadCount}</span>
-              )}
-            </button>
+        {open && (
+          <div className="notification-panel">
+            <div className="notification-panel-header">
+              <span>Notifications</span>
+              <button className="link-button" onClick={() => setOpen(false)}>
+                Close
+              </button>
+            </div>
 
-            {open && (
-              <div className="notification-dropdown">
-                {notifications.length === 0 ? (
-                  <p className="empty">No notifications</p>
-                ) : (
-                  notifications.map((n) => (
-                    <div
-                      key={n._id}
-                      className={`notification-item ${
-                        !n.isRead ? "unread" : ""
-                      }`}
-                      onClick={() => handleNotificationClick(n)}
-                    >
-                      <strong>{n.issue.issueKey}</strong>
-                      <p>{n.message}</p>
-                    </div>
-                  ))
-                )}
-              </div>
+            {notifications.length === 0 ? (
+              <p className="empty-state">No notifications yet.</p>
+            ) : (
+              notifications.map((item) => (
+                <Link
+                  key={item._id}
+                  to={`/${location.pathname.split("/")[1]}/issues/${item.issue?._id}`}
+                  className={`notification-item ${item.isRead ? "" : "notification-item-unread"}`}
+                  onClick={() => handleRead(item._id)}
+                >
+                  <strong>{item.issue?.issueKey || "Issue"}</strong>
+                  <span>{item.message}</span>
+                </Link>
+              ))
             )}
           </div>
-        </div>
-      </header>
-
-      {/* Create Issue Modal */}
-      {showCreate && (
-        <CreateIssueModal
-          role={user.role}
-          onClose={() => setShowCreate(false)}
-        />
-      )}
-    </>
+        )}
+      </div>
+    </header>
   );
 };
 

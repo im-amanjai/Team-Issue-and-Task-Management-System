@@ -1,21 +1,26 @@
-import StatsGrid from "../../components/dashboard/common/StatsGrid";
-import IssuesStatusChart from "../../components/dashboard/charts/IssuesStatusChart";
-import MonthlyIssuesChart from "../../components/dashboard/charts/MonthlyIssuesChart";
-import RecentIssues from "../../components/dashboard/common/RecentIssues";
-import "../../styles/dashboard.css";
+import { useEffect, useState } from "react";
+import DashboardOverview from "../../components/dashboard/DashboardOverview";
+import { getIssues } from "../../api/issueApi";
+import { getDashboardData } from "../../api/dashboardApi";
 
-const ManagerDashboard = ({ issues }) => {
+const ManagerDashboard = () => {
+  const [issues, setIssues] = useState([]);
+  const [summary, setSummary] = useState(null);
+
+  useEffect(() => {
+    getIssues().then(setIssues).catch(() => setIssues([]));
+    getDashboardData("manager").then(setSummary).catch(() => setSummary(null));
+  }, []);
+
   return (
-    <div className="dashboard-container">
-      <StatsGrid issues={issues} />
-
-      <div className="dashboard-charts">
-        <IssuesStatusChart issues={issues} />
-        <MonthlyIssuesChart issues={issues} />
-      </div>
-
-      <RecentIssues issues={issues} />
-    </div>
+    <DashboardOverview
+      title="Manager overview"
+      subtitle="Track assignments, issue load, and progress across your team."
+      issues={issues}
+      extraCards={[
+        { label: "Assigned issues", value: summary?.totalAssignedIssues ?? 0 },
+      ]}
+    />
   );
 };
 

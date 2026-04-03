@@ -9,7 +9,7 @@ const priorityLabel = {
 const statusLabel = {
   todo: "Todo",
   in_progress: "In Progress",
-  resolved: "Resolved",
+  completed: "Completed",
 };
 
 const priorityClass = {
@@ -21,7 +21,7 @@ const priorityClass = {
 const statusClass = {
   todo: "status-todo",
   in_progress: "status-progress",
-  resolved: "status-resolved",
+  completed: "status-resolved",
 };
 
 const IssueMiniCard = ({ issue }) => {
