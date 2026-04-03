@@ -8,6 +8,7 @@ const titleMap = {
   issues: "Issue Workspace",
   users: "User Management",
   new: "Create Issue",
+  profile: "Profile",
 };
 
 const Topbar = () => {

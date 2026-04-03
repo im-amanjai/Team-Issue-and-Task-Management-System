@@ -15,6 +15,7 @@ import ManagerIssues from "../pages/manager/ManagerIssues";
 import CreateIssue from "../pages/manager/CreateIssue";
 import ManagerIssueDetail from "../pages/manager/ManagerIssueDetail";
 import IssueDetail from "../pages/member/IssueDetail";
+import ProfilePage from "../pages/profile/ProfilePage";
 
 const AppRoutes = () => {
   return (
@@ -29,6 +30,7 @@ const AppRoutes = () => {
           <Route path="issues" element={<ManagerIssues />} />
           <Route path="issues/:id" element={<ManagerIssueDetail />} />
           <Route path="users" element={<ManageUsers />} />
+          <Route path="profile" element={<ProfilePage />} />
         </Route>
       </Route>
 
@@ -38,6 +40,7 @@ const AppRoutes = () => {
           <Route path="issues" element={<ManagerIssues />} />
           <Route path="issues/new" element={<CreateIssue />} />
           <Route path="issues/:id" element={<ManagerIssueDetail />} />
+          <Route path="profile" element={<ProfilePage />} />
         </Route>
       </Route>
 
@@ -46,6 +49,7 @@ const AppRoutes = () => {
           <Route index element={<MemberDashboard />} />
           <Route path="issues" element={<ManagerIssues />} />
           <Route path="issues/:id" element={<IssueDetail />} />
+          <Route path="profile" element={<ProfilePage />} />
         </Route>
       </Route>
 

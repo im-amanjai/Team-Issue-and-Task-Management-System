@@ -31,11 +31,22 @@ const Register = () => {
   return (
     <div className="center-screen auth-screen">
       <section className="auth-hero">
-        <p className="eyebrow">Project delivery</p>
-        <h1>Create an account and join the workspace.</h1>
+        <div className="hero-brand">
+          <div className="hero-logo" aria-hidden="true">
+            <span className="hero-logo-tile hero-logo-tile-lg"></span>
+            <span className="hero-logo-tile"></span>
+            <span className="hero-logo-tile"></span>
+            <span className="hero-logo-tile hero-logo-tile-accent"></span>
+          </div>
+          <div>
+            <p className="eyebrow">IssueTrack Pro</p>
+            <p className="hero-brand-tag">Internal issue operations</p>
+          </div>
+        </div>
+        <h1>Join the workspace and start contributing with your team.</h1>
         <p>
-          Admins can later adjust roles from the user management panel as the
-          team grows.
+          Create your account as a member or manager and collaborate in one
+          system for issue reporting, assignment, tracking, and discussion.
         </p>
       </section>
 

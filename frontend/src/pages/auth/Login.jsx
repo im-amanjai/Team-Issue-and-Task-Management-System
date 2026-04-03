@@ -34,11 +34,22 @@ const Login = () => {
   return (
     <div className="center-screen auth-screen">
       <section className="auth-hero">
-        <p className="eyebrow">Internal collaboration platform</p>
-        <h1>Track bugs, assign work, and keep your team aligned.</h1>
+        <div className="hero-brand">
+          <div className="hero-logo" aria-hidden="true">
+            <span className="hero-logo-tile hero-logo-tile-lg"></span>
+            <span className="hero-logo-tile"></span>
+            <span className="hero-logo-tile"></span>
+            <span className="hero-logo-tile hero-logo-tile-accent"></span>
+          </div>
+          <div>
+            <p className="eyebrow">IssueTrack Pro</p>
+            <p className="hero-brand-tag">Internal issue operations</p>
+          </div>
+        </div>
+        <h1>Manage issues with clear ownership and faster resolution.</h1>
         <p>
-          This project delivers role-based dashboards, issue workflows,
-          comments, notifications, and user management in one place.
+          A shared workspace for admins, managers, and members to assign work,
+          track progress, collaborate through comments, and keep delivery moving.
         </p>
       </section>
 

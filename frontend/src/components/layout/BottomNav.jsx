@@ -1,4 +1,4 @@
-import { ClipboardList, LayoutDashboard, PlusCircle, Users } from "lucide-react";
+import { ClipboardList, LayoutDashboard, PlusCircle, UserCircle, Users } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -35,17 +35,10 @@ const BottomNav = () => {
         </NavLink>
       )}
 
-      {user.role === "manager" ? (
-        <NavLink to={basePath} className="bottom-nav-item">
-          <LayoutDashboard size={18} />
-          <span>Home</span>
-        </NavLink>
-      ) : (
-        <NavLink to={`${basePath}/issues`} className="bottom-nav-item">
-          <ClipboardList size={18} />
-          <span>Work</span>
-        </NavLink>
-      )}
+      <NavLink to={`${basePath}/profile`} className="bottom-nav-item">
+        <UserCircle size={18} />
+        <span>Profile</span>
+      </NavLink>
     </nav>
   );
 };

@@ -189,6 +189,45 @@ button {
   margin-bottom: 18px;
 }
 
+.hero-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.hero-logo {
+  width: 64px;
+  height: 64px;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.08));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.hero-logo-tile {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.hero-logo-tile-lg {
+  grid-row: span 2;
+}
+
+.hero-logo-tile-accent {
+  background: #8ce6ff;
+}
+
+.hero-brand-tag {
+  margin: 4px 0 0;
+  color: rgba(234, 242, 255, 0.78);
+  font-size: 0.95rem;
+}
+
 .auth-title {
   font-size: clamp(1.9rem, 2.6vw, 2.6rem);
   line-height: 1.05;
@@ -461,8 +500,7 @@ button {
 }
 
 .topbar {
-  position: sticky;
-  top: 18px;
+  position: static;
   z-index: 3;
   border-radius: 24px;
   padding: 22px 24px;
@@ -529,6 +567,15 @@ button {
   justify-content: space-between;
   align-items: center;
   gap: 16px;
+}
+
+.panel-header + .tag-grid,
+.panel-header + .list-table,
+.panel-header + .comment-form,
+.panel-header + .detail-grid,
+.panel-header + .form-grid,
+.panel-header + .muted-text {
+  margin-top: 18px;
 }
 
 .notification-item {
@@ -620,6 +667,18 @@ button {
   padding: 14px;
 }
 
+.metric-pill span {
+  display: block;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.metric-pill strong {
+  display: block;
+  font-size: 1.28rem;
+  line-height: 1;
+}
+
 .list-table {
   display: flex;
   flex-direction: column;
@@ -646,6 +705,16 @@ button {
 .notification-item strong,
 .notification-item span {
   margin: 0;
+}
+
+.issue-row strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.issue-row p {
+  color: var(--muted);
+  line-height: 1.52;
 }
 
 .issue-meta,
@@ -705,6 +774,11 @@ button {
   gap: 12px;
 }
 
+.profile-actions {
+  max-width: 260px;
+  margin-top: 16px;
+}
+
 .link-button {
   border: none;
   background: transparent;
@@ -716,6 +790,10 @@ button {
 .empty-state {
   color: var(--muted);
   margin: 10px 0 0;
+}
+
+.panel > .muted-text:first-of-type {
+  margin-top: 16px;
 }
 
 .stat-card,
@@ -777,6 +855,11 @@ button {
 }
 
 @media (max-width: 780px) {
+  html,
+  body {
+    font-size: 15px;
+  }
+
   .shell {
     padding: 14px;
     gap: 14px;
@@ -786,24 +869,41 @@ button {
     display: none;
   }
 
+  .auth-screen {
+    width: min(460px, 100%);
+    grid-template-columns: 1fr;
+  }
+
+  .auth-hero {
+    display: none;
+  }
+
+  .auth-card {
+    width: 100%;
+  }
+
+  .hero-brand {
+    margin-bottom: 18px;
+  }
+
   .page-title {
-    font-size: 2.5rem;
-    line-height: 1.02;
+    font-size: 1.9rem;
+    line-height: 1.04;
   }
 
   .hero-panel h2,
   .panel h2 {
-    font-size: 1.9rem;
+    font-size: 1.5rem;
     line-height: 1.05;
   }
 
   .panel h3 {
-    font-size: 1.08rem;
+    font-size: 1.02rem;
   }
 
   .eyebrow {
     margin-bottom: 12px;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     letter-spacing: 0.18em;
   }
 
@@ -812,11 +912,10 @@ button {
   .detail-description,
   .issue-row p,
   .notification-item span {
-    font-size: 0.97rem;
-    line-height: 1.58;
+    font-size: 0.95rem;
+    line-height: 1.5;
   }
 
-  .topbar,
   .hero-panel,
   .issue-row,
   .sidebar-footer,
@@ -835,6 +934,7 @@ button {
 
   .tag-grid {
     grid-template-columns: 1fr;
+    gap: 14px;
   }
 
   .auth-hero,
@@ -843,102 +943,117 @@ button {
   .hero-panel,
   .stat-card,
   .topbar {
-    padding: 24px 22px;
-  }
-
-  .auth-hero {
-    min-height: 340px;
-    justify-content: flex-end;
-  }
-
-  .auth-hero h1 {
-    max-width: 11ch;
-    font-size: 2.85rem;
+    padding: 20px 18px;
   }
 
   .page-wrap {
-    padding-bottom: 124px;
+    padding-bottom: 68px;
   }
 
   .bottom-nav {
     position: fixed;
-    left: 14px;
-    right: 14px;
-    bottom: 14px;
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 5;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 10px;
-    padding: 12px;
-    border-radius: 28px;
-    background:
-      linear-gradient(180deg, color-mix(in srgb, var(--surface-strong) 94%, transparent), color-mix(in srgb, var(--surface) 82%, transparent));
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    backdrop-filter: blur(20px);
+    gap: 0;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border);
+    border-radius: 22px 22px 0 0;
+    background: color-mix(in srgb, var(--surface-strong) 96%, transparent);
+    box-shadow: 0 -12px 30px rgba(15, 23, 42, 0.14);
+    backdrop-filter: blur(18px);
   }
 
-  .bottom-nav-item {
-    display: flex;
-    flex-direction: column;
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 7px;
-    min-height: 76px;
-    padding: 10px 6px 12px;
-    border-radius: 22px;
+    gap: 5px;
+    min-height: 58px;
+    padding: 8px 4px;
+    border-radius: 14px;
     color: var(--muted);
-    font-size: 0.64rem;
+    font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.01em;
     text-align: center;
-    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-  }
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.bottom-nav-button {
+  border: none;
+  background: transparent;
+}
 
   .bottom-nav-item.active {
-    background: linear-gradient(180deg, color-mix(in srgb, var(--primary-soft) 78%, transparent), color-mix(in srgb, var(--primary) 16%, transparent));
+    background: color-mix(in srgb, var(--primary-soft) 52%, transparent);
     color: var(--primary);
-    border: 1px solid var(--border-strong);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    transform: translateY(-1px);
   }
 
   .topbar {
-    min-height: 176px;
+    min-height: auto;
+    flex-direction: row;
+    align-items: center;
     justify-content: space-between;
-  }
-
-  .topbar-actions {
-    gap: 16px;
-  }
-
-  .icon-button {
-    width: 68px;
-    height: 68px;
+    gap: 14px;
     border-radius: 20px;
   }
 
+  .topbar-actions {
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+
+  .icon-button {
+    width: 46px;
+    height: 46px;
+    border-radius: 16px;
+  }
+
+  .topbar .eyebrow {
+    display: none;
+  }
+
   .hero-panel {
-    min-height: 220px;
+    min-height: 148px;
     justify-content: flex-start;
-    gap: 18px;
+    gap: 10px;
   }
 
   .hero-panel .primary-btn {
-    width: fit-content;
-    min-width: 148px;
+    display: none;
   }
 
   .stat-card {
-    padding: 20px;
+    padding: 16px;
   }
 
   .stat-card strong {
-    font-size: 1.8rem;
+    font-size: 1.32rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
 
   .issue-row {
     gap: 14px;
-    padding: 18px;
+    padding: 16px;
+  }
+
+  .panel-header + .tag-grid,
+  .panel-header + .list-table,
+  .panel-header + .comment-form,
+  .panel-header + .detail-grid,
+  .panel-header + .form-grid,
+  .panel-header + .muted-text {
+    margin-top: 16px;
   }
 
   .issue-meta,
@@ -949,6 +1064,11 @@ button {
 }
 
 @media (max-width: 520px) {
+  html,
+  body {
+    font-size: 14px;
+  }
+
   .center-screen {
     padding: 14px;
   }
@@ -958,30 +1078,34 @@ button {
   }
 
   .page-title {
-    font-size: 2.2rem;
+    font-size: 1.64rem;
   }
 
   .hero-panel h2,
   .panel h2,
   .auth-title {
-    font-size: 1.72rem;
+    font-size: 1.28rem;
   }
 
   .panel h3 {
-    font-size: 1rem;
+    font-size: 0.94rem;
   }
 
-  .auth-hero h1 {
-    font-size: 2.35rem;
+  .panel-header + .tag-grid,
+  .panel-header + .list-table,
+  .panel-header + .comment-form,
+  .panel-header + .detail-grid,
+  .panel-header + .form-grid,
+  .panel-header + .muted-text {
+    margin-top: 14px;
   }
 
   .muted-text,
   .panel-subtitle,
   .detail-description,
   .issue-row p,
-  .notification-item span,
-  .auth-hero p:last-child {
-    font-size: 0.92rem;
+  .notification-item span {
+    font-size: 0.88rem;
   }
 
   .issue-actions,
@@ -998,25 +1122,21 @@ button {
   }
 
   .topbar {
-    min-height: 160px;
+    padding: 16px;
   }
 
   .icon-button {
-    width: 62px;
-    height: 62px;
+    width: 42px;
+    height: 42px;
   }
 
   .bottom-nav {
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
-    padding: 10px;
-    gap: 8px;
+    padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
   }
 
   .bottom-nav-item {
-    min-height: 70px;
-    font-size: 0.61rem;
-    border-radius: 20px;
+    min-height: 54px;
+    font-size: 0.62rem;
+    border-radius: 12px;
   }
 }
