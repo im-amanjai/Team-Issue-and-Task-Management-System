@@ -34,11 +34,12 @@ export const SocketProvider = ({ user, issueActions, children }) => {
     return () => {
       unregisterSocketListeners(socket);
     };
-  }, [user?._id]);
+  }, [issueActions.addIssue, issueActions.addOrUpdateIssue, issueActions.removeIssue, issueActions.updateIssue, user, user._id]);
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useSocket = () => useContext(SocketContext);
