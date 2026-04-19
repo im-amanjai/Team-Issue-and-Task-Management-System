@@ -15,7 +15,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "*",
+    origin: "https://team-issue-and-task-management-syst.vercel.app",
     credentials: true,
   })
 );
