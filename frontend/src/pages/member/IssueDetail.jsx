@@ -243,7 +243,7 @@ const IssueDetail = () => {
             {attachments.map((att) => (
               <div key={att._id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid var(--border, #eee)" }}>
                 <div>
-                  <a href={`${import.meta.env.VITE_API_URL}${att.url}`} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 500 }}>
+                  <a href={att.url} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 500 }}>
                     {att.originalName}
                   </a>
                   <p className="muted-text small-text">
