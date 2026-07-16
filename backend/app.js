@@ -23,15 +23,18 @@ const limiter = rateLimit({
 });
 
 // Middlewares
-app.use(express.json());
-app.use(limiter);
-
 app.use(
   cors({
-    origin: "https://team-issue-and-task-management-syst.vercel.app",
+    origin: [
+      "https://team-issue-and-task-management-syst.vercel.app",
+      "http://localhost:5173",
+      "http://localhost:5174",
+    ],
     credentials: true,
   })
 );
+app.use(express.json());
+app.use(limiter);
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
