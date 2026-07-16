@@ -11,7 +11,10 @@ export const getIssueById = async (id) => {
 };
 
 export const createIssue = async (payload) => {
-  const response = await axiosInstance.post("/api/issues", payload);
+  const isFormData = payload instanceof FormData;
+  const response = await axiosInstance.post("/api/issues", payload, {
+    headers: isFormData ? { "Content-Type": "multipart/form-data" } : {},
+  });
   return response.data;
 };
 

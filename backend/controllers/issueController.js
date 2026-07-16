@@ -3,6 +3,7 @@ const Issue = require("../models/Issue");
 const User = require("../models/User");
 const Notification = require("../models/Notification");
 const Comment = require("../models/Comment");
+const Attachment = require("../models/Attachment");
 const { createLog } = require("../controllers/activityLogController");
 
 const {
@@ -103,6 +104,19 @@ exports.createIssue = async (req, res) => {
     const populatedIssue = await loadIssue(issue._id);
     emitIssueCreated(populatedIssue);
     createLog({ issueId: issue._id, userId: req.user.userId, action: "created" });
+
+    if (req.files && req.files.length > 0) {
+      const attachments = req.files.map((file) => ({
+        issueId: issue._id,
+        userId: req.user.userId,
+        filename: file.filename,
+        originalName: file.originalname,
+        mimeType: file.mimetype,
+        size: file.size,
+        url: `/api/attachments/file/${file.filename}`,
+      }));
+      await Attachment.insertMany(attachments);
+    }
 
     if (safeAssignee) {
       emitIssueAssigned(populatedIssue, safeAssignee);

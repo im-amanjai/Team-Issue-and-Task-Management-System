@@ -1,13 +1,22 @@
 import { X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+const formatSize = (bytes) => {
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+};
+
 const CreateIssueModal = ({ role, onClose }) => {
   const token = localStorage.getItem("token");
+  const fileInputRef = useRef(null);
 
   const [users, setUsers] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
+  const [files, setFiles] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -25,7 +34,6 @@ const CreateIssueModal = ({ role, onClose }) => {
     };
   }, []);
 
-  // Fetch assignable users
   useEffect(() => {
     if (!token) return;
     if (role === "member") return;
@@ -45,26 +53,41 @@ const CreateIssueModal = ({ role, onClose }) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e) => {
+    const selected = Array.from(e.target.files);
+    setFiles((prev) => [...prev, ...selected].slice(0, 5));
+  };
+
+  const removeFile = (index) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async () => {
     if (!form.title.trim()) return;
+    setSubmitting(true);
 
-    const payload = {
-      title: form.title,
-      description: form.description,
-      category: form.category,
-      priority: form.priority,
-      ...(form.assignedTo && { assignee: form.assignedTo }),
-      ...(form.dueDate && { dueDate: form.dueDate }),
-    };
+    const formData = new FormData();
+    formData.append("title", form.title);
+    formData.append("description", form.description);
+    formData.append("category", form.category);
+    formData.append("priority", form.priority);
+    if (form.assignedTo) formData.append("assignee", form.assignedTo);
+    if (form.dueDate) formData.append("dueDate", form.dueDate);
+    files.forEach((file) => formData.append("files", file));
 
     try {
-      await axios.post("http://localhost:5000/api/issues", payload, {
-        headers: { Authorization: `Bearer ${token}` },
+      await axios.post("http://localhost:5000/api/issues", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
       toast.success("Issue created successfully");
       onClose();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to create issue");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -158,6 +181,38 @@ const CreateIssueModal = ({ role, onClose }) => {
               onChange={handleChange}
             />
           </div>
+
+          <div className="form-group">
+            <label>Attachments (optional, max 5 files)</label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              style={{ display: "none" }}
+              accept="image/*,application/pdf,text/plain,text/csv,application/json,application/zip"
+              onChange={handleFileChange}
+            />
+            <button
+              type="button"
+              className="secondary-btn"
+              onClick={() => fileInputRef.current?.click()}
+              style={{ marginBottom: 6 }}
+            >
+              Choose files
+            </button>
+            {files.length > 0 && (
+              <div className="stack-md">
+                {files.map((file, index) => (
+                  <div key={index} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderBottom: "1px solid var(--border, #eee)" }}>
+                    <span>{file.name} ({formatSize(file.size)})</span>
+                    <button type="button" className="link-button danger-text" onClick={() => removeFile(index)}>
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Footer */}
@@ -165,8 +220,8 @@ const CreateIssueModal = ({ role, onClose }) => {
           <button className="btn-secondary" onClick={onClose}>
             Cancel
           </button>
-          <button className="btn-primary" onClick={handleSubmit}>
-            Create Issue
+          <button className="btn-primary" onClick={handleSubmit} disabled={submitting}>
+            {submitting ? "Creating..." : "Create Issue"}
           </button>
         </div>
       </div>
