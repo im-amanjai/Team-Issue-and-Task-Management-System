@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { deleteIssue, getIssues } from "../../api/issueApi";
 import { useAuth } from "../../context/AuthContext";
+import { useDebounce } from "../../hooks/useDebounce";
 
 const initialFilters = {
   search: "",
@@ -16,14 +17,21 @@ const ManagerIssues = () => {
   const { user } = useAuth();
   const [issues, setIssues] = useState([]);
   const [filters, setFilters] = useState(initialFilters);
+  const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
+  const debouncedSearch = useDebounce(filters.search, 300);
 
-  const loadIssues = () => {
-    getIssues(filters).then((res) => setIssues(res.data || [])).catch(() => setIssues([]));
+  const loadIssues = (page = 1) => {
+    getIssues({ ...filters, search: debouncedSearch, page, limit: 10 })
+      .then((res) => {
+        setIssues(res.data || []);
+        setPagination(res.pagination || { page: 1, pages: 1, total: 0 });
+      })
+      .catch(() => setIssues([]));
   };
 
   useEffect(() => {
-    loadIssues();
-  }, [filters.search, filters.status, filters.priority, filters.category]);
+    loadIssues(1);
+  }, [debouncedSearch, filters.status, filters.priority, filters.category]);
 
   return (
     <div className="stack-lg">
@@ -82,6 +90,7 @@ const ManagerIssues = () => {
       <section className="panel">
         <div className="panel-header">
           <h2>Issue list</h2>
+          <span className="muted-text">{pagination.total} total</span>
         </div>
 
         <div className="list-table">
@@ -113,7 +122,7 @@ const ManagerIssues = () => {
                         try {
                           await deleteIssue(issue._id);
                           toast.success("Issue deleted");
-                          loadIssues();
+                          loadIssues(pagination.page);
                         } catch (err) {
                           toast.error(err.response?.data?.message || "Failed to delete issue");
                         }
@@ -127,6 +136,28 @@ const ManagerIssues = () => {
             ))
           )}
         </div>
+
+        {pagination.pages > 1 && (
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, padding: "16px 0" }}>
+            <button
+              className="secondary-btn compact-btn"
+              disabled={pagination.page <= 1}
+              onClick={() => loadIssues(pagination.page - 1)}
+            >
+              Previous
+            </button>
+            <span className="muted-text">
+              Page {pagination.page} of {pagination.pages}
+            </span>
+            <button
+              className="secondary-btn compact-btn"
+              disabled={pagination.page >= pagination.pages}
+              onClick={() => loadIssues(pagination.page + 1)}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </section>
     </div>
   );

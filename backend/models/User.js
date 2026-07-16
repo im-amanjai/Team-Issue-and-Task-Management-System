@@ -9,7 +9,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["admin", "manager", "member"],
       default: "member"
-    }
+    },
+    resetPasswordCode: { type: String, default: null },
+    resetPasswordExpires: { type: Date, default: null },
   },
   { timestamps: true }
 );

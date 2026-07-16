@@ -15,6 +15,7 @@ const CreateIssueModal = ({ role, onClose }) => {
     category: "task",
     priority: "medium",
     assignedTo: "",
+    dueDate: "",
   });
 
   useEffect(() => {
@@ -53,6 +54,7 @@ const CreateIssueModal = ({ role, onClose }) => {
       category: form.category,
       priority: form.priority,
       ...(form.assignedTo && { assignee: form.assignedTo }),
+      ...(form.dueDate && { dueDate: form.dueDate }),
     };
 
     try {
@@ -146,6 +148,16 @@ const CreateIssueModal = ({ role, onClose }) => {
               </select>
             </div>
           )}
+
+          <div className="form-group">
+            <label>Due date (optional)</label>
+            <input
+              type="date"
+              name="dueDate"
+              value={form.dueDate}
+              onChange={handleChange}
+            />
+          </div>
         </div>
 
         {/* Footer */}

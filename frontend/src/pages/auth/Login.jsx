@@ -98,6 +98,9 @@ const Login = () => {
           Admin login requires your private 4-digit code.
         </p>
         <p className="muted-text">
+          <Link to="/forgot-password">Forgot your password?</Link>
+        </p>
+        <p className="muted-text">
           Need an account? <Link to="/register">Create one</Link>
         </p>
       </section>

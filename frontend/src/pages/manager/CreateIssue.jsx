@@ -15,6 +15,7 @@ const CreateIssue = () => {
     category: "task",
     priority: "medium",
     assignee: "",
+    dueDate: "",
   });
 
   useEffect(() => {
@@ -27,10 +28,12 @@ const CreateIssue = () => {
     setError("");
 
     try {
-      const issue = await createIssue({
+      const payload = {
         ...form,
         assignee: form.assignee || undefined,
-      });
+        dueDate: form.dueDate || undefined,
+      };
+      const issue = await createIssue(payload);
       navigate(`/${user.role}/issues/${issue._id}`);
     } catch (err) {
       setError(err.response?.data?.message || "Unable to create issue");
@@ -87,6 +90,18 @@ const CreateIssue = () => {
             <option value="medium">Medium</option>
             <option value="high">High</option>
           </select>
+        </div>
+
+        <div className="form-group">
+          <label>Due date (optional)</label>
+          <input
+            className="field"
+            type="date"
+            value={form.dueDate}
+            onChange={(event) =>
+              setForm((state) => ({ ...state, dueDate: event.target.value }))
+            }
+          />
         </div>
 
         {user.role !== "member" && (

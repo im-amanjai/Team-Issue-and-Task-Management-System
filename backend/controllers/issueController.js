@@ -3,6 +3,7 @@ const Issue = require("../models/Issue");
 const User = require("../models/User");
 const Notification = require("../models/Notification");
 const Comment = require("../models/Comment");
+const { createLog } = require("../controllers/activityLogController");
 
 const {
   emitIssueCreated,
@@ -101,6 +102,7 @@ exports.createIssue = async (req, res) => {
 
     const populatedIssue = await loadIssue(issue._id);
     emitIssueCreated(populatedIssue);
+    createLog({ issueId: issue._id, userId: req.user.userId, action: "created" });
 
     if (safeAssignee) {
       emitIssueAssigned(populatedIssue, safeAssignee);
@@ -169,7 +171,8 @@ exports.updateIssue = async (req, res) => {
     }
 
     ["title", "description", "category", "priority", "dueDate"].forEach((field) => {
-      if (req.body[field] !== undefined) {
+      if (req.body[field] !== undefined && String(issue[field]) !== String(req.body[field])) {
+        createLog({ issueId: issue._id, userId: req.user.userId, action: "updated", field, oldValue: issue[field], newValue: req.body[field] });
         issue[field] = req.body[field];
       }
     });
@@ -271,6 +274,7 @@ exports.updateStatus = async (req, res) => {
 
     const populatedIssue = await loadIssue(issue._id);
     emitIssueUpdated(populatedIssue);
+    createLog({ issueId: issue._id, userId: req.user.userId, action: "status_changed", field: "status", oldValue: issue.status, newValue: status });
 
     res.json(populatedIssue);
   } catch (error) {

@@ -8,6 +8,8 @@ const commentRoutes = require("./routes/commentRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const userRoutes = require("./routes/userRoutes");
+const attachmentRoutes = require("./routes/attachmentRoutes");
+const activityLogRoutes = require("./routes/activityLogRoutes");
 
 const app = express();
 
@@ -41,5 +43,7 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/attachments", attachmentRoutes);
+app.use("/api/activity-logs", activityLogRoutes);
 
 module.exports = app;
