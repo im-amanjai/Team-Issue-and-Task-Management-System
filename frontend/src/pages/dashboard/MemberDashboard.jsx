@@ -8,7 +8,7 @@ const MemberDashboard = () => {
   const [summary, setSummary] = useState(null);
 
   useEffect(() => {
-    getIssues().then(setIssues).catch(() => setIssues([]));
+    getIssues().then((res) => setIssues(res.data || [])).catch(() => setIssues([]));
     getDashboardData("member").then(setSummary).catch(() => setSummary(null));
   }, []);
 

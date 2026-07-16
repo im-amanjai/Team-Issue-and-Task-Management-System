@@ -61,7 +61,7 @@ exports.createIssue = async (req, res) => {
       return res.status(403).json({ message: "Only managers can create issues" });
     }
 
-    const { title, description, category, priority, assignee } = req.body;
+    const { title, description, category, priority, assignee, dueDate } = req.body;
 
     if (!title || !description) {
       return res
@@ -88,6 +88,7 @@ exports.createIssue = async (req, res) => {
       reporter: req.user.userId,
       assignee: safeAssignee,
       status: "open",
+      dueDate: dueDate || null,
     });
 
     if (safeAssignee) {
@@ -113,11 +114,25 @@ exports.createIssue = async (req, res) => {
 
 exports.getIssues = async (req, res) => {
   try {
-    const issues = await Issue.find(buildIssueQuery(req))
-      .populate(issuePopulate)
-      .sort({ updatedAt: -1 });
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const skip = (page - 1) * limit;
 
-    res.json(issues);
+    const query = buildIssueQuery(req);
+    const [issues, total] = await Promise.all([
+      Issue.find(query).populate(issuePopulate).sort({ updatedAt: -1 }).skip(skip).limit(limit),
+      Issue.countDocuments(query),
+    ]);
+
+    res.json({
+      data: issues,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -153,7 +168,7 @@ exports.updateIssue = async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    ["title", "description", "category", "priority"].forEach((field) => {
+    ["title", "description", "category", "priority", "dueDate"].forEach((field) => {
       if (req.body[field] !== undefined) {
         issue[field] = req.body[field];
       }
@@ -269,6 +284,10 @@ exports.deleteIssue = async (req, res) => {
 
     if (!issue) {
       return res.status(404).json({ message: "Issue not found" });
+    }
+
+    if (req.user.role === "manager" && String(issue.reporter) !== String(req.user.userId)) {
+      return res.status(403).json({ message: "Managers can only delete issues they created" });
     }
 
     await Comment.deleteMany({ issueId: issue._id });

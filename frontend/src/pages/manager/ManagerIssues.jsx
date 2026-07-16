@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import { deleteIssue, getIssues } from "../../api/issueApi";
 import { useAuth } from "../../context/AuthContext";
 
@@ -17,7 +18,7 @@ const ManagerIssues = () => {
   const [filters, setFilters] = useState(initialFilters);
 
   const loadIssues = () => {
-    getIssues(filters).then(setIssues).catch(() => setIssues([]));
+    getIssues(filters).then((res) => setIssues(res.data || [])).catch(() => setIssues([]));
   };
 
   useEffect(() => {
@@ -109,8 +110,13 @@ const ManagerIssues = () => {
                     <button
                       className="danger-btn compact-btn"
                       onClick={async () => {
-                        await deleteIssue(issue._id);
-                        loadIssues();
+                        try {
+                          await deleteIssue(issue._id);
+                          toast.success("Issue deleted");
+                          loadIssues();
+                        } catch (err) {
+                          toast.error(err.response?.data?.message || "Failed to delete issue");
+                        }
                       }}
                     >
                       Delete

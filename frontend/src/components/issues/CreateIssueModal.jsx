@@ -1,6 +1,7 @@
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const CreateIssueModal = ({ role, onClose }) => {
   const token = localStorage.getItem("token");
@@ -58,9 +59,10 @@ const CreateIssueModal = ({ role, onClose }) => {
       await axios.post("http://localhost:5000/api/issues", payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      toast.success("Issue created successfully");
       onClose();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to create issue");
+      toast.error(err.response?.data?.message || "Failed to create issue");
     }
   };
 

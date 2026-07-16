@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const rateLimit = require("express-rate-limit");
 
 const authRoutes = require("./routes/authRoutes");
 const issueRoutes = require("./routes/issueRoutes");
@@ -10,8 +11,18 @@ const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 
+// Rate limiter
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Too many requests, please try again later." },
+});
+
 // Middlewares
 app.use(express.json());
+app.use(limiter);
 
 app.use(
   cors({

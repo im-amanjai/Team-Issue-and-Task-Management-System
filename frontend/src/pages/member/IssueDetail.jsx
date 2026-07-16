@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 import {
   assignIssue,
   deleteIssue,
@@ -25,6 +26,7 @@ const IssueDetail = () => {
   const [assignableUsers, setAssignableUsers] = useState([]);
   const [commentText, setCommentText] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const loadPage = async () => {
     try {
@@ -60,12 +62,17 @@ const IssueDetail = () => {
             <p className="eyebrow">{issue.issueKey}</p>
             <h2>{issue.title}</h2>
           </div>
-          {user.role === "admin" && (
+          {(user.role === "admin" || (user.role === "manager" && issue.reporter?._id === user._id)) && (
             <button
               className="danger-btn"
               onClick={async () => {
-                await deleteIssue(issue._id);
-                navigate(`/${user.role}/issues`);
+                try {
+                  await deleteIssue(issue._id);
+                  toast.success("Issue deleted");
+                  navigate(`/${user.role}/issues`);
+                } catch (err) {
+                  toast.error(err.response?.data?.message || "Failed to delete issue");
+                }
               }}
             >
               Delete issue
@@ -123,8 +130,13 @@ const IssueDetail = () => {
               value=""
               onChange={async (event) => {
                 if (!event.target.value) return;
-                const updated = await updateIssueStatus(issue._id, event.target.value);
-                setIssue(updated);
+                try {
+                  const updated = await updateIssueStatus(issue._id, event.target.value);
+                  setIssue(updated);
+                  toast.success("Status updated");
+                } catch (err) {
+                  toast.error(err.response?.data?.message || "Failed to update status");
+                }
               }}
             >
               <option value="">Change status</option>
@@ -147,12 +159,20 @@ const IssueDetail = () => {
           className="comment-form"
           onSubmit={async (event) => {
             event.preventDefault();
-            const newComment = await addComment({
-              issueId: issue._id,
-              text: commentText,
-            });
-            setComments((items) => [...items, newComment]);
-            setCommentText("");
+            if (!commentText.trim()) return;
+            setSubmitting(true);
+            try {
+              const newComment = await addComment({
+                issueId: issue._id,
+                text: commentText,
+              });
+              setComments((items) => [...items, newComment]);
+              setCommentText("");
+            } catch (err) {
+              toast.error(err.response?.data?.message || "Failed to add comment");
+            } finally {
+              setSubmitting(false);
+            }
           }}
         >
           <textarea
@@ -161,8 +181,8 @@ const IssueDetail = () => {
             value={commentText}
             onChange={(event) => setCommentText(event.target.value)}
           />
-          <button className="primary-btn" type="submit">
-            Post comment
+          <button className="primary-btn" type="submit" disabled={submitting}>
+            {submitting ? "Posting..." : "Post comment"}
           </button>
         </form>
 

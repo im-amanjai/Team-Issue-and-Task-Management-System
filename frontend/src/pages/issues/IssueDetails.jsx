@@ -1,32 +1,61 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 import ConfirmModal from "../../components/common/ConfirmModal";
 import IssueComments from "../../components/issues/IssueComments";
+import { getIssueById, deleteIssue } from "../../api/issueApi";
 import "../../styles/issue.css";
 
 const IssueDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const [issue, setIssue] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const handleDeleteIssue = () => {
-    setShowDeleteModal(false);
-    alert("Issue deleted (UI only)");
+  useEffect(() => {
+    const fetchIssue = async () => {
+      try {
+        const data = await getIssueById(id);
+        setIssue(data);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to load issue");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchIssue();
+  }, [id]);
+
+  const handleDeleteIssue = async () => {
+    try {
+      await deleteIssue(issue._id);
+      setShowDeleteModal(false);
+      toast.success("Issue deleted");
+      navigate(-1);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to delete issue");
+      setShowDeleteModal(false);
+    }
   };
 
-  const issue = {
-    id: id,
-    title: "Login bug on Chrome",
-    status: "Open",
-    priority: "High",
-    assignee: "Amit",
-    description:
-      "Users are unable to login on Chrome browser due to a token issue.",
-  };
+  if (loading) {
+    return <div className="issue-details-page">Loading issue details...</div>;
+  }
+
+  if (error) {
+    return <div className="issue-details-page"><p className="error-text">{error}</p></div>;
+  }
+
+  if (!issue) {
+    return <div className="issue-details-page"><p>Issue not found.</p></div>;
+  }
 
   return (
     <div className="issue-details-page">
       <div className="issue-details-header">
-        <h2>Login bug on Chrome</h2>
+        <h2>{issue.title}</h2>
 
         <button
           className="btn-link danger"
@@ -37,16 +66,16 @@ const IssueDetails = () => {
       </div>
 
       <div className="issue-meta">
-        <span className={`badge status-${issue.status.toLowerCase()}`}>
-          {issue.status}
+        <span className={`badge status-${issue.status}`}>
+          {issue.status.replace("_", " ")}
         </span>
 
-        <span className={`badge priority-${issue.priority.toLowerCase()}`}>
+        <span className={`badge priority-${issue.priority}`}>
           {issue.priority}
         </span>
 
         <span className="assignee">
-          Assigned to: <strong>{issue.assignee}</strong>
+          Assigned to: <strong>{issue.assignee?.name || "Unassigned"}</strong>
         </span>
       </div>
 
@@ -55,7 +84,7 @@ const IssueDetails = () => {
         <p>{issue.description}</p>
       </div>
 
-      <IssueComments />
+      <IssueComments issueId={issue._id} />
 
       {showDeleteModal && (
         <ConfirmModal

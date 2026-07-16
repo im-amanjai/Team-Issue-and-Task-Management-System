@@ -4,9 +4,8 @@ import { getMyIssues } from "../../api/issueApi";
 import "../../styles/issue.css";
 
 const statusLabelMap = {
-  todo: "Todo",
+  open: "Open",
   in_progress: "In Progress",
-  done: "Done",
   completed: "Completed",
 };
 
@@ -16,19 +15,17 @@ const MyIssues = () => {
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [loading, setLoading] = useState(true);
 
-  const token = localStorage.getItem("token");
-
   useEffect(() => {
-    getMyIssues(token)
+    getMyIssues()
       .then((res) => {
-        setIssues(res.data);
+        setIssues(res.data || []);
         setLoading(false);
       })
       .catch((err) => {
         console.error("Failed to load issues", err);
         setLoading(false);
       });
-  }, [token]);
+  }, []);
 
   const filteredIssues = issues.filter((issue) => {
     const statusMatch =
@@ -59,9 +56,8 @@ const MyIssues = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             <option value="all">All</option>
-            <option value="todo">Todo</option>
+            <option value="open">Open</option>
             <option value="in_progress">In Progress</option>
-            <option value="done">Done</option>
             <option value="completed">Completed</option>
           </select>
         </div>
@@ -87,14 +83,13 @@ const MyIssues = () => {
               <th>Issue</th>
               <th>Status</th>
               <th>Priority</th>
-              <th>Project</th>
             </tr>
           </thead>
 
           <tbody>
             {filteredIssues.length === 0 ? (
               <tr>
-                <td colSpan="4" className="no-data">
+                <td colSpan="3" className="no-data">
                   No issues found
                 </td>
               </tr>
@@ -114,7 +109,7 @@ const MyIssues = () => {
                     <span
                       className={`badge status-${issue.status}`}
                     >
-                      {statusLabelMap[issue.status]}
+                      {statusLabelMap[issue.status] || issue.status}
                     </span>
                   </td>
 
@@ -125,8 +120,6 @@ const MyIssues = () => {
                       {issue.priority}
                     </span>
                   </td>
-
-                  <td>{issue.project?.key || "-"}</td>
                 </tr>
               ))
             )}

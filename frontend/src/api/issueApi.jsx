@@ -38,3 +38,8 @@ export const deleteIssue = async (id) => {
   const response = await axiosInstance.delete(`/api/issues/${id}`);
   return response.data;
 };
+
+export const getMyIssues = async (params = {}) => {
+  const response = await axiosInstance.get("/api/issues", { params });
+  return response.data;
+};

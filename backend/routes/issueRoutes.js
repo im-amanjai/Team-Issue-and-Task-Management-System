@@ -20,6 +20,6 @@ router.get("/:id", verifyToken, getIssueById);
 router.patch("/:id", verifyToken, updateIssue);
 router.patch("/:id/assign", verifyToken, allowRoles("admin", "manager"), assignIssue);
 router.patch("/:id/status", verifyToken, updateStatus);
-router.delete("/:id", verifyToken, allowRoles("admin"), deleteIssue);
+router.delete("/:id", verifyToken, allowRoles("admin", "manager"), deleteIssue);
 
 module.exports = router;
