@@ -41,7 +41,7 @@ const CreateIssueModal = ({ role, onClose }) => {
     setLoadingUsers(true);
 
     axios
-      .get("http://localhost:5000/api/users/assignable", {
+      .get(import.meta.env.VITE_API_URL + "/api/users/assignable", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setUsers(res.data))
@@ -76,7 +76,7 @@ const CreateIssueModal = ({ role, onClose }) => {
     files.forEach((file) => formData.append("files", file));
 
     try {
-      await axios.post("http://localhost:5000/api/issues", formData, {
+      await axios.post(import.meta.env.VITE_API_URL + "/api/issues", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",

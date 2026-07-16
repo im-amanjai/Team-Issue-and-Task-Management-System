@@ -113,7 +113,7 @@ exports.createIssue = async (req, res) => {
         originalName: file.originalname,
         mimeType: file.mimetype,
         size: file.size,
-        url: `/api/attachments/file/${file.filename}`,
+        url: file.path,
       }));
       await Attachment.insertMany(attachments);
     }
